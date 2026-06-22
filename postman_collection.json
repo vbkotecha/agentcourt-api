@@ -1,0 +1,108 @@
+{
+  "info": {
+    "name": "AgentCourt API",
+    "_postman_id": "agentcourt-api-collection",
+    "description": "AgentCourt — Policy-driven dispute resolution for agent commerce.\n\nBase URL: https://agentcourt-api-production.up.railway.app\n\nSubmit disputes across 4 policy templates (20 rules) and get deterministic, evidence-weighted rulings.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://agentcourt-api-production.up.railway.app"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/health",
+        "description": "Verify API is live"
+      }
+    },
+    {
+      "name": "Submit Freelance Delivery Dispute",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/v1/disputes",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"claimant\": \"buyer_agent\",\n  \"respondent\": \"seller_agent\",\n  \"contract\": {\n    \"parties\": [\"buyer_agent\", \"seller_agent\"],\n    \"obligations\": [\"Deliver logo design by June 20\"],\n    \"deadlines\": [\"2026-06-20\"],\n    \"deliverables\": [\"3 logo concepts\"],\n    \"payment_terms\": \"10 USDC on delivery\"\n  },\n  \"claim\": \"Deliverable was never received.\",\n  \"desired_remedy\": \"full_refund\",\n  \"policy\": \"freelance-delivery\",\n  \"evidence\": [\n    {\n      \"type\": \"contract\",\n      \"source\": \"agreement.json\",\n      \"timestamp\": \"2026-06-15\",\n      \"claimed_fact\": \"Seller must deliver 3 logo concepts by June 20\"\n    },\n    {\n      \"type\": \"payment_proof\",\n      \"source\": \"x402_receipt\",\n      \"timestamp\": \"2026-06-15\",\n      \"claimed_fact\": \"Buyer paid 10 USDC upfront\"\n    },\n    {\n      \"type\": \"log\",\n      \"source\": \"design_tool\",\n      \"timestamp\": \"2026-06-22\",\n      \"claimed_fact\": \"No design files exported or delivered\"\n    }\n  ]\n}"
+        },
+        "description": "Submit a non-delivery dispute. Expected ruling: non-delivery / full_refund"
+      }
+    },
+    {
+      "name": "Submit Milestone Payment Dispute",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/v1/disputes",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"claimant\": \"developer_agent\",\n  \"respondent\": \"client_agent\",\n  \"contract\": {\n    \"parties\": [\"developer_agent\", \"client_agent\"],\n    \"obligations\": [\"Complete API integration milestone\"],\n    \"deadlines\": [\"2026-06-18\"],\n    \"deliverables\": [\"Working API\"],\n    \"payment_terms\": \"25 USDC within 7 days of completion\"\n  },\n  \"claim\": \"Milestone completed but payment never received.\",\n  \"desired_remedy\": \"payment\",\n  \"policy\": \"milestone-payment\",\n  \"evidence\": [\n    {\n      \"type\": \"contract\",\n      \"source\": \"milestone_agreement.json\",\n      \"timestamp\": \"2026-06-10\",\n      \"claimed_fact\": \"25 USDC due on milestone completion within 7 days\"\n    },\n    {\n      \"type\": \"commit\",\n      \"source\": \"github\",\n      \"timestamp\": \"2026-06-17\",\n      \"claimed_fact\": \"API endpoint implemented and deployed\"\n    },\n    {\n      \"type\": \"message\",\n      \"source\": \"slack\",\n      \"timestamp\": \"2026-06-18\",\n      \"claimed_fact\": \"Buyer acknowledged milestone completion\"\n    },\n    {\n      \"type\": \"log\",\n      \"source\": \"payment_ledger\",\n      \"timestamp\": \"2026-06-22\",\n      \"claimed_fact\": \"No payment received 4 days after completion\"\n    }\n  ]\n}"
+        },
+        "description": "Submit a milestone payment dispute. Expected ruling: milestone-completed-unpaid / full_payment_plus_penalty"
+      }
+    },
+    {
+      "name": "Submit Bug Bounty Dispute",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/v1/disputes",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"claimant\": \"researcher_agent\",\n  \"respondent\": \"vendor_agent\",\n  \"contract\": {\n    \"parties\": [\"researcher_agent\", \"vendor_agent\"],\n    \"obligations\": [\"Pay for reproducible critical bugs\"],\n    \"deliverables\": [\"Bug report\"],\n    \"payment_terms\": \"50 USDC for critical severity\"\n  },\n  \"claim\": \"Critical bug rejected but it is reproducible.\",\n  \"desired_remedy\": \"payment\",\n  \"policy\": \"bug-bounty\",\n  \"evidence\": [\n    {\n      \"type\": \"contract\",\n      \"source\": \"bounty_program.json\",\n      \"timestamp\": \"2026-06-01\",\n      \"claimed_fact\": \"50 USDC for critical bugs\"\n    },\n    {\n      \"type\": \"file\",\n      \"source\": \"bug_report.md\",\n      \"timestamp\": \"2026-06-19\",\n      \"claimed_fact\": \"Detailed reproduction steps for critical vulnerability\"\n    },\n    {\n      \"type\": \"log\",\n      \"source\": \"test_env\",\n      \"timestamp\": \"2026-06-20\",\n      \"claimed_fact\": \"Bug reproduced in 3 independent runs confirming critical severity\"\n    },\n    {\n      \"type\": \"message\",\n      \"source\": \"email\",\n      \"timestamp\": \"2026-06-21\",\n      \"claimed_fact\": \"Vendor claimed non-reproducible without testing\"\n    }\n  ]\n}"
+        },
+        "description": "Submit a bug bounty dispute. Expected ruling: valid-bug-full-payout / full_payout"
+      }
+    },
+    {
+      "name": "Submit SLA Monitoring Dispute",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/v1/disputes",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"claimant\": \"consumer_agent\",\n  \"respondent\": \"provider_agent\",\n  \"contract\": {\n    \"parties\": [\"consumer_agent\", \"provider_agent\"],\n    \"obligations\": [\"Maintain 99.9% uptime SLA\", \"Max latency 200ms\"],\n    \"payment_terms\": \"500 USDC/month with SLA credits\"\n  },\n  \"claim\": \"Uptime fell below 99.9% SLA.\",\n  \"desired_remedy\": \"service_credit\",\n  \"policy\": \"sla-monitoring\",\n  \"evidence\": [\n    {\n      \"type\": \"contract\",\n      \"source\": \"agreement.json\",\n      \"timestamp\": \"2026-06-01\",\n      \"claimed_fact\": \"Provider agrees to 99.9% uptime SLA\"\n    },\n    {\n      \"type\": \"log\",\n      \"source\": \"uptime_monitor\",\n      \"timestamp\": \"2026-06-22\",\n      \"claimed_fact\": \"Measured actual uptime of 98.2% during June monitoring period\"\n    },\n    {\n      \"type\": \"log\",\n      \"source\": \"incident_log\",\n      \"timestamp\": \"2026-06-15\",\n      \"claimed_fact\": \"Three outages totaling 4 hours of downtime\"\n    }\n  ]\n}"
+        },
+        "description": "Submit an SLA breach dispute. Expected ruling: uptime-violation / service_credit"
+      }
+    },
+    {
+      "name": "List All Verdicts",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/v1/verdicts",
+        "description": "View all public verdicts from the dashboard"
+      }
+    },
+    {
+      "name": "List Policy Templates",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/v1/policies",
+        "description": "View all available policy templates"
+      }
+    },
+    {
+      "name": "Get Specific Policy",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/v1/policies/milestone-payment",
+        "description": "View a specific policy template with all rules"
+      }
+    }
+  ]
+}
