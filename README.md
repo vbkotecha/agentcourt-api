@@ -178,6 +178,26 @@ AgentCourt is the missing layer. Submit evidence, apply policy rules, get a bind
 
 **Works with any commerce protocol** — x402, ERC-8183, AP2, or custom agreements. AgentCourt doesn't hold funds. It adjudicates outcomes.
 
+## How We Differ
+
+| | AgentCourt | Arbitova | Synmerco |
+|---|---|---|---|
+| **Model** | Standalone judgment layer | Escrow + bundled arbitration | Full-stack marketplace |
+| **Custody** | Never. Non-custodial. | Holds funds in escrow contract | Holds funds in escrow |
+| **Pricing** | Per dispute resolution call | 0.5% per release + 2.0% per dispute | 3.25% per settled deal |
+| **Determinism** | Policy rules — same evidence = same ruling | AI arbiter — subjective | Internal system |
+| **Integration** | API + SDK + MCP server. Works with any platform | Use their escrow contract | Use their marketplace |
+| **Auditable** | Every ruling public with matched rules and evidence scores | Public verdicts | Internal |
+| **Lock-in** | None. Bring your own escrow, marketplace, payment rail | Must use their escrow contract | Must use their platform |
+
+AgentCourt is not an escrow company. We don't compete with payment protocols. We are the judgment layer that any of them can call.
+
+## Pricing
+
+**Design Partner Program (Now):** Free for first 5 partners. Full API access. Custom policy template included.
+
+**Production (Post-Launch):** Per-dispute pricing. No transaction fees. No custody fees. No platform fees. You only pay when you need a ruling.
+
 ## License
 
 MIT
