@@ -794,6 +794,10 @@
             </div>
             <div class="grid grid-3">
               <div class="card">
+                <h3>ADRP Compatible</h3>
+                <p>Implements IETF draft-stone-adrp-00. Produces signed RulingBundles, EscrowDirectives, and passes verify_resolution.</p>
+              </div>
+              <div class="card">
                 <h3>MCP Server</h3>
                 <p>Native MCP (Model Context Protocol) server with 5 tools. Compatible with Letta, Claude, and any MCP-aware framework.</p>
                 <code class="code-block">python3 mcp_server.py</code>
@@ -807,6 +811,14 @@
                 <h3>JavaScript SDK</h3>
                 <p>Zero-dependency. Works in Node 18+ and browsers. Full TypeScript types included.</p>
                 <code class="code-block">npm i @agentcourt/sdk</code>
+              </div>
+              <div class="card">
+                <h3>BCP Integration</h3>
+                <p>Resolves disputes from BCP Protocol sessions. Converts DISPUTE state into ruling and settlement directive.</p>
+              </div>
+              <div class="card">
+                <h3>Deterministic Engine</h3>
+                <p>Same evidence = same ruling. Every time. No LLM in the critical path. 28/28 tests passing.</p>
               </div>
             </div>
           </div>
