@@ -382,6 +382,20 @@
         line-height: 1.65;
       }
 
+      .code-block {
+        display: block;
+        background: rgba(0, 0, 0, 0.4);
+        color: var(--accent-2);
+        padding: 10px 14px;
+        border-radius: var(--radius-sm);
+        font-size: 13px;
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        margin-top: 12px;
+        border: 1px solid var(--border);
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
       .card-icon {
         display: inline-flex;
         align-items: center;
@@ -766,6 +780,32 @@
                 </p>
               </div>
               <a class="button button-primary" href="mailto:hello@agentcourt.to">Become a Design Partner</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container">
+            <div class="section-header">
+              <span class="badge">Developer Tools</span>
+              <h2>Integrate in minutes.</h2>
+            </div>
+            <div class="grid grid-3">
+              <div class="card">
+                <h3>MCP Server</h3>
+                <p>Native MCP (Model Context Protocol) server with 5 tools. Compatible with Letta, Claude, and any MCP-aware framework.</p>
+                <code class="code-block">python3 mcp_server.py</code>
+              </div>
+              <div class="card">
+                <h3>Python SDK</h3>
+                <p>Zero-dependency. Standard library only. Copy one file, no pip install needed.</p>
+                <code class="code-block">from agentcourt import AgentCourt</code>
+              </div>
+              <div class="card">
+                <h3>JavaScript SDK</h3>
+                <p>Zero-dependency. Works in Node 18+ and browsers. Full TypeScript types included.</p>
+                <code class="code-block">npm i @agentcourt/sdk</code>
+              </div>
             </div>
           </div>
         </section>
