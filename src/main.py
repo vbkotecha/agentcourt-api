@@ -284,3 +284,143 @@ async def health():
         "engine": "policy-engine-v1",
         "policies": [p["name"] for p in list_policies()],
     }
+
+
+@app.get("/v1/verdicts")
+async def list_verdicts(limit: int = 50):
+    """Public verdict dashboard — returns all resolved cases."""
+    cases = list_cases(limit)
+    verdicts = []
+    for c in cases:
+        r = c.get("ruling", {})
+        req = c.get("request", {})
+        verdicts.append({
+            "case_id": r.get("case_id", req.get("case_id", "")),
+            "policy": r.get("policy_name", req.get("policy", "")),
+            "ruling": r.get("ruling", "")[:200],
+            "confidence": r.get("confidence", ""),
+            "remedy": r.get("remedy", ""),
+            "matched_rule": r.get("matched_rule_id", ""),
+            "claimant": req.get("claimant", ""),
+            "respondent": req.get("respondent", ""),
+            "facts_established": len(r.get("facts_established", [])),
+            "evidence_count": len(r.get("evidence_scores", [])),
+            "ruled_at": r.get("ruled_at", ""),
+        })
+    return {
+        "total": len(verdicts),
+        "verdicts": verdicts,
+    }
+
+
+from fastapi.responses import HTMLResponse
+
+@app.get("/verdicts", response_class=HTMLResponse)
+async def verdict_dashboard():
+    """Public verdict dashboard HTML page."""
+    cases = list_cases(50)
+    rows = ""
+    for c in cases:
+        r = c.get("ruling", {})
+        req = c.get("request", {})
+        conf = r.get("confidence", "")
+        conf_color = {"high": "#6ee7b7", "medium": "#fbbf24", "low": "#f87171"}.get(conf, "#9aa9c7")
+        cid = r.get("case_id", req.get("case_id", ""))
+        pol = r.get("policy_name", req.get("policy", ""))
+        claimant = req.get("claimant", "")
+        respondent = req.get("respondent", "")
+        rule = r.get("matched_rule_id", "")
+        remedy = r.get("remedy", "")
+        ruled = r.get("ruled_at", "")[:19]
+        rows += f"""
+        <tr>
+          <td><code>{cid[:12] if cid else ''}</code></td>
+          <td>{pol}</td>
+          <td>{claimant}</td>
+          <td>{respondent}</td>
+          <td style="color:{conf_color};font-weight:600">{conf.upper()}</td>
+          <td>{rule}</td>
+          <td>{remedy}</td>
+          <td style="color:var(--muted);font-size:13px">{ruled}</td>
+        </tr>"""
+
+    if not cases:
+        rows = """<tr><td colspan="8" style="text-align:center;padding:60px;color:#9aa9c7">
+            No disputes resolved yet. Be the first — POST to /v1/disputes
+        </td></tr>"""
+
+    high_count = len([c for c in cases if c.get("ruling", {}).get("confidence") == "high"])
+    rules_set = set(c.get("ruling", {}).get("matched_rule_id", "") for c in cases if c.get("ruling", {}).get("matched_rule_id"))
+    policies_set = set(c.get("ruling", {}).get("policy_name", c.get("request", {}).get("policy", "")) for c in cases)
+
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgentCourt — Verdict Dashboard</title>
+  <style>
+    :root {{ --bg:#07111f; --panel:rgba(13,23,41,.88); --border:rgba(143,168,255,.16); --text:#e8edf8; --muted:#9aa9c7; --accent:#7c5cff; --accent-2:#31d0ff; }}
+    * {{ box-sizing:border-box; }}
+    body {{ background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif; margin:0; padding:40px 20px; }}
+    .container {{ max-width:1200px; margin:0 auto; }}
+    h1 {{ font-size:32px; margin:0 0 8px; }}
+    h1 span {{ color:var(--accent-2); }}
+    .subtitle {{ color:var(--muted); margin:0 0 32px; font-size:16px; }}
+    .stats {{ display:flex; gap:24px; margin-bottom:32px; flex-wrap:wrap; }}
+    .stat {{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 28px; }}
+    .stat-value {{ font-size:28px; font-weight:700; color:var(--accent-2); }}
+    .stat-label {{ color:var(--muted); font-size:13px; text-transform:uppercase; letter-spacing:1px; }}
+    table {{ width:100%; border-collapse:collapse; background:var(--panel); border-radius:14px; overflow:hidden; border:1px solid var(--border); }}
+    th {{ text-align:left; padding:14px 16px; background:rgba(124,92,255,.08); color:var(--accent); font-size:13px; text-transform:uppercase; letter-spacing:.5px; }}
+    td {{ padding:12px 16px; border-top:1px solid var(--border); font-size:14px; }}
+    tr:hover td {{ background:rgba(124,92,255,.04); }}
+    .header-link {{ display:inline-block; margin-top:16px; color:var(--accent-2); text-decoration:none; font-size:14px; }}
+    .header-link:hover {{ text-decoration:underline; }}
+    code {{ background:rgba(0,0,0,.3); padding:2px 6px; border-radius:4px; font-size:12px; }}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>AgentCourt <span>Verdict Dashboard</span></h1>
+    <p class="subtitle">Every ruling is public. Every decision is auditable. Policy-driven, not prediction-driven.</p>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value">{len(cases)}</div>
+        <div class="stat-label">Total Cases</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">{high_count}</div>
+        <div class="stat-label">High Confidence</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">{len(rules_set)}</div>
+        <div class="stat-label">Rules Triggered</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">{len(policies_set)}</div>
+        <div class="stat-label">Policies Used</div>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Case ID</th>
+          <th>Policy</th>
+          <th>Claimant</th>
+          <th>Respondent</th>
+          <th>Confidence</th>
+          <th>Rule</th>
+          <th>Remedy</th>
+          <th>Ruled At</th>
+        </tr>
+      </thead>
+      <tbody>{rows}
+      </tbody>
+    </table>
+    <a class="header-link" href="/docs">API Docs →</a>
+    &nbsp;&nbsp;
+    <a class="header-link" href="/health">Health Check →</a>
+  </div>
+</body>
+</html>"""
