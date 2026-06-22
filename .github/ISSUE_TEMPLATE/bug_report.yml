@@ -1,0 +1,35 @@
+name: Bug Report
+description: Report a bug in AgentCourt
+title: "[Bug] <description>"
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: dispute
+    attributes:
+      label: Dispute Payload
+      description: The JSON payload that triggered the issue
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Ruling
+      description: What ruling did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Ruling
+      description: What ruling did you get?
+      render: json
+    validations:
+      required: true
