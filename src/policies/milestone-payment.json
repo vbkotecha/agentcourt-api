@@ -6,7 +6,7 @@
     {
       "id": "milestone-completed-paid",
       "condition": "milestone_completed == true AND\npayment_received == true\n",
-      "ruling_template": "Milestone {milestone_id} was completed and payment was received.\nBoth parties fulfilled obligations for this milestone.\nNo remedy is owed.\n",
+      "ruling_template": "Milestone was completed and payment was received.\nBoth parties fulfilled obligations for this milestone.\nNo remedy is owed.\n",
       "confidence": "high",
       "remedy": "none",
       "facts_required": [
@@ -17,7 +17,7 @@
     {
       "id": "milestone-completed-unpaid",
       "condition": "milestone_completed == true AND\npayment_received == false AND\ndays_since_completion > payment_terms_days\n",
-      "ruling_template": "Milestone {milestone_id} was completed on {completion_date}.\nPayment of {amount_due} is {days_overdue} days overdue.\nRespondent is in material breach of payment terms.\n",
+      "ruling_template": "Milestone was completed but payment was not received.\nPayment is {days_since_completion} days overdue (terms: {payment_terms_days} days).\nRespondent is in material breach of payment terms.\n",
       "confidence": "high",
       "remedy": "full_payment_plus_penalty",
       "facts_required": [
@@ -30,7 +30,7 @@
     {
       "id": "milestone-incomplete-payment-demanded",
       "condition": "milestone_completed == false AND\ndeliverable_was_accepted == false\n",
-      "ruling_template": "Milestone {milestone_id} was not completed but payment is being demanded.\nNo payment is owed until milestone criteria are met.\n",
+      "ruling_template": "Milestone was not completed but payment is being demanded.\nNo payment is owed until milestone criteria are met.\n",
       "confidence": "high",
       "remedy": "deny_payment",
       "facts_required": [
@@ -41,7 +41,7 @@
     {
       "id": "milestone-partially-complete",
       "condition": "partial_delivery_detected == true AND\ndeliverable_was_accepted != true\n",
-      "ruling_template": "Milestone {milestone_id} is {milestone_progress_pct}% complete.\nQuality disputes on partial work require evidence review.\nRecommend partial payment proportional to completed work.\n",
+      "ruling_template": "Milestone is {milestone_progress_pct}% complete.\nQuality disputes on partial work require evidence review.\nRecommend partial payment proportional to completed work.\n",
       "confidence": "medium",
       "remedy": "proportional_payment",
       "facts_required": [
@@ -53,7 +53,7 @@
     {
       "id": "milestone-disputed-completion",
       "condition": "milestone_completed == null\n",
-      "ruling_template": "Whether milestone {milestone_id} was completed is disputed.\nEvidence is insufficient to determine completion status.\nRecommend escalation with technical review.\n",
+      "ruling_template": "Whether milestone was completed is disputed.\nEvidence is insufficient to determine completion status.\nRecommend escalation with technical review.\n",
       "confidence": "low",
       "remedy": "escalate",
       "facts_required": [

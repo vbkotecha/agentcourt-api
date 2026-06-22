@@ -7,6 +7,7 @@
       "id": "uptime-violation",
       "name": "SLA Uptime Breach",
       "condition": "actual_uptime < required_uptime AND monitoring_period_confirmed == true",
+      "ruling_template": "SLA uptime breach confirmed. Actual uptime of {actual_uptime}% fell below the required {required_uptime}% threshold.\nMonitoring data verified from submitted evidence.\nService credit is owed to the claimant.",
       "confidence": "high",
       "remedy": "service_credit",
       "description": "Service uptime fell below the agreed SLA threshold during the monitoring period"
@@ -15,6 +16,7 @@
       "id": "latency-breach",
       "name": "SLA Latency Violation",
       "condition": "actual_latency > max_latency AND monitoring_period_confirmed == true",
+      "ruling_template": "SLA latency breach confirmed. Actual latency of {actual_latency}ms exceeded the maximum allowed {max_latency}ms.\nMonitoring data verified from submitted evidence.\nService credit is owed to the claimant.",
       "confidence": "high",
       "remedy": "service_credit",
       "description": "Response latency exceeded the maximum agreed threshold"
@@ -23,6 +25,7 @@
       "id": "partial-degradation",
       "name": "Partial Service Degradation",
       "condition": "actual_uptime < required_uptime AND actual_uptime >= degraded_threshold AND monitoring_period_confirmed == true",
+      "ruling_template": "Partial service degradation detected. Actual uptime of {actual_uptime}% was below the {required_uptime}% SLA but above the {degraded_threshold}% degraded threshold.\nPartial service credit recommended based on severity of degradation.",
       "confidence": "medium",
       "remedy": "partial_credit",
       "description": "Service experienced partial degradation but did not fully breach SLA"
@@ -31,6 +34,7 @@
       "id": "incidents-within-sla",
       "name": "Incidents Within Acceptable SLA",
       "condition": "actual_uptime >= required_uptime AND monitoring_period_confirmed == true",
+      "ruling_template": "Incidents were recorded but uptime remained within acceptable SLA bounds.\nActual uptime of {actual_uptime}% met or exceeded the required {required_uptime}% threshold.\nNo service credit is owed.",
       "confidence": "high",
       "remedy": "deny_credit",
       "description": "Recorded incidents occurred but uptime remained within agreed SLA bounds"
@@ -39,6 +43,7 @@
       "id": "insufficient-monitoring",
       "name": "Insufficient Monitoring Data",
       "condition": "monitoring_period_confirmed == false",
+      "ruling_template": "Insufficient monitoring data to determine if SLA was breached.\nNo uptime, latency, or availability evidence was provided from monitoring systems.\nCase requires additional monitoring evidence for resolution.",
       "confidence": "low",
       "remedy": "escalate",
       "description": "Monitoring data is insufficient to determine if SLA was breached"

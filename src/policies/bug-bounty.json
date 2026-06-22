@@ -6,7 +6,7 @@
     {
       "id": "valid-bug-full-payout",
       "condition": "bug_is_reproducible == true AND\nseverity_meets_threshold == true AND\ndisclosure_compliant == true\n",
-      "ruling_template": "Bug report validated. Reproducible {bug_type} with {severity} severity.\nDisclosure followed program rules.\nFull bounty payout of {bounty_amount} is owed.\n",
+      "ruling_template": "Bug report validated. Bug is reproducible with {actual_severity} severity.\nDisclosure followed program rules.\nFull bounty payout is owed.\n",
       "confidence": "high",
       "remedy": "full_payout",
       "facts_required": [
@@ -18,7 +18,7 @@
     {
       "id": "valid-bug-partial-severity",
       "condition": "bug_is_reproducible == true AND\nseverity_meets_threshold == false AND\nactual_severity != null AND\ndisclosure_compliant == true\n",
-      "ruling_template": "Bug is reproducible but severity is disputed.\nReported as {reported_severity}, evaluated as {actual_severity}.\nAdjusted payout based on actual severity: {adjusted_amount}.\n",
+      "ruling_template": "Bug is reproducible but severity is disputed.\nEvaluated severity: {actual_severity}.\nAdjusted payout based on actual severity.\n",
       "confidence": "medium",
       "remedy": "partial_payout",
       "facts_required": [
@@ -41,7 +41,7 @@
     {
       "id": "disclosure-violation",
       "condition": "disclosure_compliant == false\n",
-      "ruling_template": "Bug is valid but disclosure rules were violated.\n{violation_detail}\nPayout reduced or denied per program terms.\n",
+      "ruling_template": "Bug is valid but disclosure rules were violated.\nPayout reduced or denied per program terms.\n",
       "confidence": "medium",
       "remedy": "reduced_or_denied",
       "facts_required": [
