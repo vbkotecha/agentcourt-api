@@ -280,18 +280,20 @@ async def root():
 @app.get("/api-docs", response_class=HTMLResponse)
 async def api_docs_page():
     """Developer-friendly API documentation page."""
-    # Try multiple paths since Railway runs from src/
-    candidates = [
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "landing", "docs.html"),
-        os.path.join(os.getcwd(), "landing", "docs.html"),
-        os.path.join(os.getcwd(), "..", "landing", "docs.html"),
-        "/app/landing/docs.html",
-    ]
-    for docs_path in candidates:
-        if os.path.exists(docs_path):
-            with open(docs_path) as f:
-                return f.read()
-    return HTMLResponse(content="<h1>API Docs</h1><p>Docs page not found on server. Visit <a href='/docs'>/docs</a> for Swagger.</p>", status_code=200)
+    docs_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "landing", "docs.html")
+    if os.path.exists(docs_path):
+        with open(docs_path) as f:
+            return f.read()
+    return HTMLResponse(content="<h1>API Docs</h1><p>Visit <a href='/docs'>/docs</a> for Swagger.</p>")
+
+@app.get("/demos", response_class=HTMLResponse)
+async def demos_page():
+    """Interactive dispute resolution demos."""
+    demos_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "landing", "demos.html")
+    if os.path.exists(demos_path):
+        with open(demos_path) as f:
+            return f.read()
+    return HTMLResponse(content="<h1>Demos</h1><p>Not found.</p>")
 
 
 @app.get("/health")
