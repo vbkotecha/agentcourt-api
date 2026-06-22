@@ -1,10 +1,12 @@
 # AgentCourt
 
-**The dispute layer for agent commerce.**
+**The Evaluator layer for agent commerce.**
 
-Visa, Mastercard, and Google are building payment rails for AI agents (ACP, UCP, AP2, x402). Nobody is building the dispute resolution layer. That's us.
+ERC-8183 defines an "Evaluator" — the entity that attests whether a job was completed correctly, triggering payment release or refund. AgentCourt is that layer: policy-driven, deterministic, open source.
 
-Submit evidence. Apply policy rules. Get a deterministic ruling. No escrow, no courtroom theater.
+Submit evidence. Apply policy rules. Get a deterministic ruling in under 500ms. No escrow, no courtroom theater.
+
+![Version](https://img.shields.io/badge/version-1.1.0-blue) ![Tests](https://img.shields.io/badge/tests-39%2F39-green) ![License](https://img.shields.io/badge/license-MIT-blue) ![Status](https://img.shields.io/badge/status-live-success)
 
 ## Why AgentCourt?
 
@@ -66,27 +68,16 @@ print(ruling.ruling)      # The respondent failed to deliver...
 | `GET` | `/health` | API health check |
 | `GET` | `/docs` | Interactive API docs (Swagger) |
 
-## Policy Templates
+## Policy Templates (6 total, 34 rules)
 
-### freelance-delivery
-Disputes over digital work delivery: non-delivery, late delivery, scope issues.
-
-**Rules:** non-delivery, late-delivery-accepted, late-delivery-rejected, partial-delivery, default-no-match
-
-### milestone-payment  
-Disputes over milestone payments: unpaid milestones, overdue payments, partial payments.
-
-**Rules:** milestone-completed-unpaid, milestone-completed-paid-on-time, milestone-incomplete-payment-justified, milestone-overdue-disputed, default-no-match
-
-### bug-bounty
-Disputes over bug bounty claims: reproducibility, severity, disclosure compliance.
-
-**Rules:** valid-bug-full-payout, non-reproducible-bug, severity-below-threshold, non-compliant-disclosure, default-no-match
-
-### sla-monitoring
-Disputes over Service Level Agreement violations: uptime, latency, response time, availability.
-
-**Rules:** uptime-violation, latency-breach, partial-degradation, incidents-within-sla, insufficient-monitoring
+| Template | Rules | Use Case |
+|----------|-------|----------|
+| `freelance-delivery` | 6 | Digital work disputes: non-delivery, late delivery, scope issues |
+| `milestone-payment` | 5 | Staged payments: unpaid milestones, overdue, partial |
+| `bug-bounty` | 5 | Security bounties: reproducibility, severity, disclosure |
+| `sla-monitoring` | 5 | Service violations: uptime, latency, degraded service |
+| `api-quality` | 7 | Paid API disputes: schema mismatch, wrong types, stale data |
+| `physical-commerce` | 6 | Product purchases: wrong item, damage, non-delivery, returns |
 
 ## How It Works
 
@@ -109,75 +100,68 @@ Disputes over Service Level Agreement violations: uptime, latency, response time
 
 ### Python (zero-dependency)
 
-```bash
-pip install agentcourt  # coming soon to PyPI
-```
-
-Or copy `sdk/agentcourt.py` — zero dependencies, standard library only.
+Copy [`sdk/agentcourt_python_sdk.py`](sdk/agentcourt_python_sdk.py) — standard library only, no pip install needed.
 
 ### JavaScript / TypeScript
 
-```bash
-npm install @agentcourt/sdk  # coming soon to npm
-```
+Copy [`sdk/agentcourt.js`](sdk/agentcourt.js) — zero dependencies, works in Node 18+ and browsers.
+TypeScript declarations in [`sdk/agentcourt.d.ts`](sdk/agentcourt.d.ts).
 
-```javascript
-const { AgentCourt } = require('@agentcourt/sdk');
+### Postman
 
-const court = new AgentCourt();
-const ruling = await court.resolve({
-  policy: 'freelance-delivery',
-  claimant: 'buyer_agent',
-  respondent: 'seller_agent',
-  claim: 'Deliverable never received',
-  desiredRemedy: 'full_refund',
-  contract: { parties: ['buyer_agent', 'seller_agent'] },
-  evidence: [{ type: 'contract', source: 'agreement.json', claimedFact: 'Deadline missed' }],
-});
-```
-
-Or copy `sdk/npm/index.js` — zero dependencies, works in Node 18+ and browsers.
+Import [`postman_collection.json`](postman_collection.json) — 9 ready-to-run requests for all 5 dispute types.
 
 ## MCP Server
 
-AgentCourt ships with an MCP (Model Context Protocol) server. Any MCP-aware agent framework can call AgentCourt directly.
+AgentCourt ships with MCP tool definitions compatible with Claude Desktop, Cursor, and Claude Code. See [`src/mcp_server_config.py`](src/mcp_server_config.py).
 
-```bash
-python3 mcp_server.py
-```
+**3 MCP Tools:**
+- `agentcourt_resolve_dispute` — Submit a dispute, get a ruling
+- `agentcourt_list_policies` — See available policy templates
+- `agentcourt_get_verdict` — Retrieve a past verdict by case ID
 
-**5 MCP Tools:**
-- `resolve_dispute` — Submit a dispute, get a ruling
-- `list_policies` — See available policy templates
-- `get_policy` — Read rules of a specific policy
-- `get_case` — Retrieve a past case by ID
-- `health_check` — Verify API status
+## x402 Payment
 
-Compatible with Letta, Claude, and any MCP-compatible agent framework.
+AgentCourt is x402-native. The [`x402_middleware.py`](src/x402_middleware.py) module enables per-call payments:
+
+- **$0.05/dispute** via USDC on Base
+- OpenAPI `x-payment-info` annotations for AgentCash discovery
+- `/.well-known/x402` discovery document for x402scan indexing
+- PaymentVerifier with replay protection
+
+**Already indexed on x402scan** — 16 endpoints discovered via OpenAPI spec.
+
+## Stats
+
+- **6 policy templates** with **34 rules** across 5 dispute domains
+- **39/39 tests passing** (17 engine + 11 ADRP adapter + 11 x402 middleware)
+- **Live on x402scan** with 16 discoverable endpoints
+- **ADRP-compatible** (IETF draft-stone-adrp-00)
 
 ## Architecture
 
 ```
 ├── src/
-│   ├── main.py              # FastAPI app with REST endpoints
+│   ├── main.py                 # FastAPI app with REST endpoints
+│   ├── x402_middleware.py       # x402 payment layer ($0.05 USDC/dispute)
+│   ├── mcp_server_config.py     # MCP tool definitions (Claude, Cursor, Claude Code)
 │   ├── engine/
-│   │   └── policy_engine.py # Deterministic rule evaluation engine
+│   │   └── policy_engine.py     # Deterministic rule evaluation engine
 │   └── policies/
 │       ├── freelance-delivery.json
 │       ├── milestone-payment.json
 │       ├── bug-bounty.json
-│       └── sla-monitoring.json
+│       ├── sla-monitoring.json
+│       ├── api-quality.json
+│       └── physical-commerce.json
 ├── sdk/
-│   ├── agentcourt.py        # Python SDK (zero-dependency)
-│   └── npm/                 # JavaScript/TypeScript SDK
-│       ├── index.js
-│       ├── index.d.ts
-│       └── test.js
-├── mcp_server.py            # MCP server (stdio transport)
-├── clawmart/
-│   └── SKILL.md             # ClawMart marketplace listing
-└── landing/
-    └── index.html           # Landing page
+│   ├── agentcourt_python_sdk.py # Python SDK (zero-dependency, dataclasses)
+│   ├── agentcourt.js            # JavaScript SDK (ESM + CommonJS)
+│   └── agentcourt.d.ts          # TypeScript declarations
+├── tests/                       # 39/39 tests (engine + ADRP + x402)
+├── content/                     # Blog posts, proposals, competitive analysis
+├── postman_collection.json      # 9 ready-to-run Postman requests
+└── Dockerfile                   # Production deployment
 ```
 
 ## Why AgentCourt Exists
