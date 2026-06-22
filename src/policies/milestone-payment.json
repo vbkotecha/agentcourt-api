@@ -1,7 +1,7 @@
 {
   "name": "milestone-payment",
   "version": "1.0",
-  "description": "Dispute resolution for milestone-based payment contracts — staged deliverables with payment gates",
+  "description": "Dispute resolution for milestone-based payment contracts \u2014 staged deliverables with payment gates",
   "rules": [
     {
       "id": "milestone-completed-paid",
@@ -29,7 +29,7 @@
     },
     {
       "id": "milestone-incomplete-payment-demanded",
-      "condition": "milestone_completed == false AND\npayment_demanded == true\n",
+      "condition": "milestone_completed == false AND\ndeliverable_was_accepted == false\n",
       "ruling_template": "Milestone {milestone_id} was not completed but payment is being demanded.\nNo payment is owed until milestone criteria are met.\n",
       "confidence": "high",
       "remedy": "deny_payment",
@@ -40,7 +40,7 @@
     },
     {
       "id": "milestone-partially-complete",
-      "condition": "milestone_completed == false AND\nmilestone_progress_pct >= 50 AND\ndispute_type == \"quality\"\n",
+      "condition": "partial_delivery_detected == true AND\ndeliverable_was_accepted != true\n",
       "ruling_template": "Milestone {milestone_id} is {milestone_progress_pct}% complete.\nQuality disputes on partial work require evidence review.\nRecommend partial payment proportional to completed work.\n",
       "confidence": "medium",
       "remedy": "proportional_payment",

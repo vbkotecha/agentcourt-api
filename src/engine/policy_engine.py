@@ -142,7 +142,7 @@ def extract_facts(
     acceptance_evidence = [e for e in scored_evidence if "accept" in e.get("claimed_fact", "").lower() or "approv" in e.get("claimed_fact", "").lower()]
 
     # Evidence of delivery requires BOTH: delivery-type evidence AND claimed_fact indicating delivery occurred
-    delivery_keywords = ("deliver", "submitted", "committed", "uploaded", "completed", "shipped", "sent", "provided")
+    delivery_keywords = ("deliver", "submitted", "committed", "uploaded", "completed", "shipped", "sent", "provided", "pushed", "deployed", "implemented", "exported")
     # Negative delivery phrases — evidence saying delivery did NOT happen
     non_delivery_keywords = ("no ", "not ", "never ", "without", "absence", "missing", "nothing ", "zero ", "0 ")
     actual_delivery_evidence = [
@@ -348,12 +348,13 @@ def extract_facts(
     # Disclosure compliance from evidence
     disclosure_evidence = [e for e in scored_evidence if any(kw in e.get("claimed_fact", "").lower() for kw in ["disclos", "responsible", "notified vendor", "private report"])]
     non_compliant_evidence = [e for e in scored_evidence if any(kw in e.get("claimed_fact", "").lower() for kw in ["non-compliant", "violated", "published publicly", "public disclosure", "tweeted", "posted publicly", "leaked", "before vendor", "without notification", "publicly disclosed"])]
-    if disclosure_evidence and not non_compliant_evidence:
-        facts["disclosure_compliant"] = metadata.get("disclosure_compliant", True)
-    elif non_compliant_evidence and not disclosure_evidence:
+    if non_compliant_evidence:
+        # Non-compliant evidence exists → disclosure was violated
         facts["disclosure_compliant"] = metadata.get("disclosure_compliant", False)
+    elif disclosure_evidence:
+        facts["disclosure_compliant"] = metadata.get("disclosure_compliant", True)
     else:
-        facts["disclosure_compliant"] = metadata.get("disclosure_compliant", True if not non_compliant_evidence else None)
+        facts["disclosure_compliant"] = metadata.get("disclosure_compliant", True)
 
     # ─── SLA MONITORING FACTS ──────────────────────────────────────────────
     # Extract uptime, latency, and monitoring data from evidence

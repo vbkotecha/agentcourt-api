@@ -1,7 +1,7 @@
 {
   "name": "bug-bounty",
   "version": "1.0",
-  "description": "Dispute resolution for bug bounty programs — severity disputes, reproducibility, and disclosure compliance",
+  "description": "Dispute resolution for bug bounty programs \u2014 severity disputes, reproducibility, and disclosure compliance",
   "rules": [
     {
       "id": "valid-bug-full-payout",
@@ -40,7 +40,7 @@
     },
     {
       "id": "disclosure-violation",
-      "condition": "bug_is_reproducible == true AND\nseverity_meets_threshold == true AND\ndisclosure_compliant == false\n",
+      "condition": "disclosure_compliant == false\n",
       "ruling_template": "Bug is valid but disclosure rules were violated.\n{violation_detail}\nPayout reduced or denied per program terms.\n",
       "confidence": "medium",
       "remedy": "reduced_or_denied",
