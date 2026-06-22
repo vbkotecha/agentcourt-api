@@ -1,94 +1,91 @@
-# AgentCourt Launch Thread — @vbkotecha
+# AgentCourt Launch Thread — X/Twitter
 
-## Thread: "Agent commerce needs a court, not escrow"
+Post from @AgentCourtHQ when account is created.
+Include screenshot of verdict dashboard or API response.
 
-1/ AI agents are starting to transact. They're buying APIs, hiring other agents, delivering work, and moving money.
+---
 
-But there's a missing layer nobody's talking about:
+1/ We just shipped AgentCourt — the dispute resolution layer for agent commerce.
 
-What happens when the agent is wrong?
+Visa, Mastercard, and Google built the payment rails for AI agents.
+Nobody built what happens when transactions go wrong.
 
-2/ Today, the answer is: nothing.
+We did. Here's what it does. 🧵
 
-No dispute resolution. No accountability. No recourse.
+2/ The problem:
 
-The buyer eats the cost. The marketplace absorbs the risk. The trust tax gets passed to everyone.
+When an AI agent buys something and it goes wrong — late delivery, partial work, SLA breach, disputed bug bounty — who resolves it?
 
-3/ Escrow doesn't fix this. Escrow just holds money hostage.
+Card networks aren't built for agent disputes. There's no framework.
 
-The real question isn't "who has the money?" — it's "who's right?"
+Until now.
 
-That's a policy question, not a custody question.
+3/ AgentCourt is a policy-driven dispute resolution API.
 
-4/ That's why we built AgentCourt.
+Submit evidence. Apply rules. Get a ruling.
 
-AgentCourt is a policy-driven dispute resolution layer for agent commerce.
+Same evidence always produces the same ruling. Deterministic, not probabilistic.
 
-You submit evidence. You apply policy rules. You get a ruling.
+4/ Four policy templates, 21 rules, all live:
 
-5/ No courtroom theater. No escrow. No smart contract custody.
+📦 Freelance delivery (6 rules)
+💰 Milestone payment (5 rules)  
+🐛 Bug bounty (5 rules)
+📊 SLA monitoring (5 rules)
 
-Just:
-- Evidence (contracts, commits, logs, hashes)
-- Policy (rules you define or use from templates)
-- Ruling (with confidence band, remedy, and audit trail)
+Each tested with real evidence scenarios. 17/17 passing.
 
-6/ Here's what a ruling looks like:
+5/ How it works:
 
-```
-Policy: freelance-delivery
-Rule: non-delivery
-Confidence: HIGH
-Remedy: full_refund
-```
+1. Both agents submit evidence (contracts, logs, commits, receipts)
+2. Engine extracts facts using NLP + evidence scoring
+3. Rules evaluate against facts
+4. Output: matched rule + confidence + remedy + reasoning
 
-"The respondent failed to deliver the agreed-upon work. No deliverable was produced or submitted."
+Average time: <500ms
 
-7/ Every ruling includes:
-- Confidence band (high/medium/low)
-- Evidence scoring (weighted by type, reliability, recency)
-- Facts established vs facts unknown
-- Full audit trail
+6/ Try it right now:
 
-You can see exactly WHY the ruling was made.
+Live demos: agentcourt-api-production.up.railway.app/demos
+API docs: agentcourt-api-production.up.railway.app/api-docs
+Swagger UI: agentcourt-api-production.up.railway.app/swagger
+Verdict dashboard: agentcourt-api-production.up.railway.app/verdicts
 
-8/ We're shipping with 3 policy templates:
-- Freelance delivery disputes (non-delivery, late delivery, scope creep)
-- Milestone payment disputes (unpaid milestones, overdue payments)
-- Bug bounty disputes (reproducibility, severity, disclosure compliance)
+7/ For developers:
 
-Each template has 5 rules with conditions, confidence bands, and remedies.
+• Python SDK (pip install agentcourt)
+• JavaScript/TypeScript SDK (npm i @agentcourt/sdk)
+• MCP server for Claude integration
+• OpenAPI 3.0.3 spec at /openapi.yaml
+• Postman collection included
+• MIT licensed
 
-9/ The API is live right now:
-
-```
-POST https://agentcourt-api-production.up.railway.app/v1/disputes
-GET /v1/policies
-GET /docs
-```
-
-It's deterministic. The same evidence + policy always produces the same ruling.
-
-10/ Our thesis:
-
-Agent commerce will be bigger than e-commerce. But it won't happen without trust infrastructure.
-
-Escrow is the wrong primitive. Policy-based rulings are the right one.
-
-11/ We're looking for 5 design partners.
+8/ We're looking for 5 design partners.
 
 If you're building:
-- Agent marketplaces
-- x402 payment flows
-- Freelance platforms
-- AI service marketplaces
+• An agent marketplace
+• An escrow service
+• A bounty platform
+• An SLA monitoring tool
 
-DM me. We'll map your disputes to structured rulings.
+You need dispute resolution. Let's talk.
 
-12/ AgentCourt is live. Policies are open. API is public.
+DM us or email support@agentcourt.to
 
-No escrow. No courtroom. Just evidence, policy, and rulings.
+9/ The agent economy needs three layers:
 
-The dispute layer for agent commerce.
+Transport (A2A, MCP) ✅ Built
+Payment (x402, AP2, Visa IC) ✅ Built
+Dispute resolution ✅ AgentCourt
 
-🔗 agentcourt-api-production.up.railway.app/docs
+The stack is complete.
+
+Build with us: agentcourt-api-production.up.railway.app
+
+---
+
+# Notes for posting:
+- Space out tweets 30-60 seconds apart
+- Pin tweet 1 after posting
+- Quote-tweet tweet 1 from @vbkotecha with commentary
+- Include a screenshot or GIF of the demo page in tweet 1 or 6
