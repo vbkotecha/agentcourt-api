@@ -278,9 +278,9 @@ def extract_facts(
 
     # --- Bug bounty facts ---
     repro_evidence = [e for e in scored_evidence if "reproduc" in e.get("claimed_fact", "").lower()]
-    non_repro_evidence = [e for e in scored_evidence if "non-reproduc" in e.get("claimed_fact", "").lower() or "cannot reproduce" in e.get("claimed_fact", "").lower()]
+    non_repro_evidence = [e for e in scored_evidence if any(kw in e.get("claimed_fact", "").lower() for kw in ["non-reproduc", "cannot reproduce", "not reproduc", "could not reproduce", "not able to reproduce", "failed to reproduce", "unable to reproduce"])]
     # Separate positive reproduction evidence from mentions of non-reproducibility
-    positive_repro = [e for e in repro_evidence if "non-reproduc" not in e.get("claimed_fact", "").lower() and "cannot reproduce" not in e.get("claimed_fact", "").lower()]
+    positive_repro = [e for e in repro_evidence if not any(kw in e.get("claimed_fact", "").lower() for kw in ["non-reproduc", "cannot reproduce", "not reproduc", "could not reproduce", "not able to reproduce", "failed to reproduce", "unable to reproduce"])]
     
     if positive_repro and not non_repro_evidence:
         facts["bug_is_reproducible"] = True
