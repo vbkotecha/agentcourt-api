@@ -1,7 +1,7 @@
 {
   "name": "freelance-delivery",
   "version": "1.0",
-  "description": "Dispute resolution for freelance delivery contracts — work for hire with deadlines and deliverables",
+  "description": "Dispute resolution for freelance delivery contracts \u2014 work for hire with deadlines and deliverables",
   "rules": [
     {
       "id": "delivery-on-time-accepted",
@@ -47,6 +47,18 @@
         "deliverable_was_accepted",
         "evidence_of_delivery",
         "quality_issues_documented"
+      ]
+    },
+    {
+      "id": "partial-delivery",
+      "condition": "evidence_of_delivery == true AND\npartial_delivery_detected == true\n",
+      "ruling_template": "Only partial work was delivered. {partial_summary}\nRemedy: proportional refund.\n",
+      "confidence": "medium",
+      "remedy": "partial_refund",
+      "facts_required": [
+        "deliverable_was_accepted",
+        "evidence_of_delivery",
+        "partial_delivery_detected"
       ]
     },
     {

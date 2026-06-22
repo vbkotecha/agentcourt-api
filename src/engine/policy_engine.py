@@ -143,9 +143,12 @@ def extract_facts(
 
     # Evidence of delivery requires BOTH: delivery-type evidence AND claimed_fact indicating delivery occurred
     delivery_keywords = ("deliver", "submitted", "committed", "uploaded", "completed", "shipped", "sent", "provided")
+    # Negative delivery phrases — evidence saying delivery did NOT happen
+    non_delivery_keywords = ("no ", "not ", "never ", "without", "absence", "missing", "nothing ", "zero ", "0 ")
     actual_delivery_evidence = [
         e for e in delivery_evidence
         if any(kw in e.get("claimed_fact", "").lower() for kw in delivery_keywords)
+        and not any(e.get("claimed_fact", "").lower().startswith(neg) or (neg + "deliver" in e.get("claimed_fact", "").lower()) or (neg + "export" in e.get("claimed_fact", "").lower()) or (neg + "file" in e.get("claimed_fact", "").lower()) or (neg + "submit" in e.get("claimed_fact", "").lower()) or (neg + "work" in e.get("claimed_fact", "").lower()) for neg in non_delivery_keywords)
     ]
     facts["evidence_of_delivery"] = len(actual_delivery_evidence) > 0
     # payment_received: True if evidence shows payment was sent, False if evidence shows no payment
@@ -174,6 +177,15 @@ def extract_facts(
         facts["deliverable_was_accepted"] = False
     else:
         facts["deliverable_was_accepted"] = None
+
+    # Partial delivery detection — evidence indicating some work was delivered but not all
+    partial_keywords = ("only ", "partial", " of ", "just ", "out of", "incomplete")
+    partial_evidence = [
+        e for e in scored_evidence
+        if any(kw in e.get("claimed_fact", "").lower() for kw in partial_keywords)
+        and not any(neg in e.get("claimed_fact", "").lower() for neg in ["no ", "not ", "never "])
+    ]
+    facts["partial_delivery_detected"] = len(partial_evidence) > 0
 
     # Delivery timing
     deadlines = contract.get("deadlines") or []
