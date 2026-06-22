@@ -91,24 +91,92 @@ Disputes over bug bounty claims: reproducibility, severity, disclosure complianc
 
 ## SDK
 
+### Python (zero-dependency)
+
 ```bash
-pip install agentcourt  # coming soon
+pip install agentcourt  # coming soon to PyPI
 ```
 
 Or copy `sdk/agentcourt.py` — zero dependencies, standard library only.
 
+### JavaScript / TypeScript
+
+```bash
+npm install @agentcourt/sdk  # coming soon to npm
+```
+
+```javascript
+const { AgentCourt } = require('@agentcourt/sdk');
+
+const court = new AgentCourt();
+const ruling = await court.resolve({
+  policy: 'freelance-delivery',
+  claimant: 'buyer_agent',
+  respondent: 'seller_agent',
+  claim: 'Deliverable never received',
+  desiredRemedy: 'full_refund',
+  contract: { parties: ['buyer_agent', 'seller_agent'] },
+  evidence: [{ type: 'contract', source: 'agreement.json', claimedFact: 'Deadline missed' }],
+});
+```
+
+Or copy `sdk/npm/index.js` — zero dependencies, works in Node 18+ and browsers.
+
+## MCP Server
+
+AgentCourt ships with an MCP (Model Context Protocol) server. Any MCP-aware agent framework can call AgentCourt directly.
+
+```bash
+python3 mcp_server.py
+```
+
+**5 MCP Tools:**
+- `resolve_dispute` — Submit a dispute, get a ruling
+- `list_policies` — See available policy templates
+- `get_policy` — Read rules of a specific policy
+- `get_case` — Retrieve a past case by ID
+- `health_check` — Verify API status
+
+Compatible with Letta, Claude, and any MCP-compatible agent framework.
+
 ## Architecture
 
 ```
-src/
-├── main.py              # FastAPI app with REST endpoints
-├── engine/
-│   └── policy_engine.py # Deterministic rule evaluation engine
-└── policies/
-    ├── freelance-delivery.json
-    ├── milestone-payment.json
-    └── bug-bounty.json
+├── src/
+│   ├── main.py              # FastAPI app with REST endpoints
+│   ├── engine/
+│   │   └── policy_engine.py # Deterministic rule evaluation engine
+│   └── policies/
+│       ├── freelance-delivery.json
+│       ├── milestone-payment.json
+│       └── bug-bounty.json
+├── sdk/
+│   ├── agentcourt.py        # Python SDK (zero-dependency)
+│   └── npm/                 # JavaScript/TypeScript SDK
+│       ├── index.js
+│       ├── index.d.ts
+│       └── test.js
+├── mcp_server.py            # MCP server (stdio transport)
+├── clawmart/
+│   └── SKILL.md             # ClawMart marketplace listing
+└── landing/
+    └── index.html           # Landing page
 ```
+
+## Why AgentCourt Exists
+
+The agentic economy is rapidly building payment rails:
+
+- **x402** (Coinbase) — protocol for AI agents to pay each other via USDC on Base. No dispute mechanism.
+- **ERC-8183** (Ethereum draft, Feb 2026) — conditional payments and escrow for agent transactions. Explicitly states: *"no dispute resolution within the core spec."*
+- **AP2** (Google) — Agent Payments Protocol. Moves money, doesn't resolve disagreements.
+- **ClawBank + Shodai** — First AI-to-AI Ricardian contracts on Ethereum. Milestone logic is live. No adjudication layer.
+
+Every major protocol handles payments, escrow, and execution. None of them handle **what happens when two agents disagree**.
+
+AgentCourt is the missing layer. Submit evidence, apply policy rules, get a binding ruling.
+
+**Works with any commerce protocol** — x402, ERC-8183, AP2, or custom agreements. AgentCourt doesn't hold funds. It adjudicates outcomes.
 
 ## License
 

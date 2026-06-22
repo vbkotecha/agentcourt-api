@@ -134,10 +134,16 @@ def extract_facts(
 
     # --- Delivery facts (freelance/milestone) ---
     delivery_evidence = [e for e in scored_evidence if e.get("type") in ("commit", "file", "screenshot", "log")]
-    payment_evidence = [e for e in scored_evidence if e.get("type") in ("payment", "invoice", "receipt")]
+    payment_evidence = [e for e in scored_evidence if e.get("type") in ("payment", "invoice", "receipt", "payment_proof")]
     acceptance_evidence = [e for e in scored_evidence if "accept" in e.get("claimed_fact", "").lower() or "approv" in e.get("claimed_fact", "").lower()]
 
-    facts["evidence_of_delivery"] = len(delivery_evidence) > 0
+    # Evidence of delivery requires BOTH: delivery-type evidence AND claimed_fact indicating delivery occurred
+    delivery_keywords = ("deliver", "submitted", "committed", "uploaded", "completed", "shipped", "sent", "provided")
+    actual_delivery_evidence = [
+        e for e in delivery_evidence
+        if any(kw in e.get("claimed_fact", "").lower() for kw in delivery_keywords)
+    ]
+    facts["evidence_of_delivery"] = len(actual_delivery_evidence) > 0
     facts["payment_received"] = any(p.get("score", 0) > 0.5 for p in payment_evidence)
 
     # Determine acceptance
@@ -147,7 +153,7 @@ def extract_facts(
         facts["deliverable_was_accepted"] = True
     elif rejected_mentions > accepted_mentions:
         facts["deliverable_was_accepted"] = False
-    elif not delivery_evidence:
+    elif not actual_delivery_evidence:
         # No delivery evidence at all → can't have been accepted
         facts["deliverable_was_accepted"] = False
     else:
@@ -155,11 +161,11 @@ def extract_facts(
 
     # Delivery timing
     deadlines = contract.get("deadlines") or []
-    if deadlines and delivery_evidence:
+    if deadlines and actual_delivery_evidence:
         try:
             deadline = datetime.fromisoformat(deadlines[0].replace("Z", ""))
             delivery_ts = None
-            for e in delivery_evidence:
+            for e in actual_delivery_evidence:
                 if e.get("timestamp"):
                     delivery_ts = datetime.fromisoformat(e["timestamp"].replace("Z", ""))
                     break

@@ -1,30 +1,44 @@
 ---
 name: agentcourt
-description: Autonomous dispute resolution for AI agents. Submit disputes, receive rulings with confidence scores, reasoning chains, and remedies. Supports freelance, milestone, and bug bounty dispute templates. Uses x402 micropayments on Base.
+description: Policy-driven dispute resolution for AI agent commerce. Submit disputes with evidence, receive deterministic rulings with confidence bands, reasoning, and remedies. No escrow required. MCP server available. Works with x402, any marketplace, any payment system.
 ---
 
-# AgentCourt — Dispute Resolution for AI Agents
+# AgentCourt — Policy-Driven Dispute Resolution for Agent Commerce
 
 ## What It Does
 
-AgentCourt resolves disputes between autonomous agents using AI-powered rulings. Submit a dispute with contract details, evidence, and desired remedy. Receive a structured ruling with confidence score, reasoning chain, fact tables, and recommended remedy.
+AgentCourt resolves disputes between autonomous agents using a deterministic policy engine — not subjective AI judgment. Submit a dispute with contract details, evidence, and desired remedy. Receive a structured ruling with confidence band, fact tables, evidence scores, and recommended remedy.
+
+**Key differentiator:** Policy-driven, not prediction-driven. The same evidence always produces the same ruling. No escrow required — works with any payment system.
 
 ## When to Use
 
-- When two agents disagree on deliverable quality
+- When two agents disagree on deliverable quality or delivery
 - When a milestone payment is disputed
 - When a bug bounty severity is contested
 - When a service agreement is breached
 - When you need neutral, instant dispute resolution without human arbitration
+- When you need a ruling to enforce in your marketplace, escrow, or reputation system
 
-## API Endpoint
+## Integration Options
+
+### Option 1: MCP Server (Recommended for agent-native integration)
+
+```bash
+python3 mcp_server.py
+```
+
+Exposes 5 MCP tools: `resolve_dispute`, `list_policies`, `get_policy`, `get_case`, `health_check`. Any MCP-aware agent framework can call AgentCourt directly.
+
+### Option 2: REST API
 
 Base URL: `https://agentcourt-api-production.up.railway.app`
+Docs: `https://agentcourt-api-production.up.railway.app/docs`
 
 ### Submit a Dispute
 
 ```bash
-curl -X POST https://agentcourt-api-production.up.railway.app/dispute \
+curl -X POST https://agentcourt-api-production.up.railway.app/v1/disputes \
   -H "Content-Type: application/json" \
   -d '{
     "claimant": "AgentA",
@@ -78,12 +92,6 @@ curl -X POST https://agentcourt-api-production.up.railway.app/dispute \
 curl https://agentcourt-api-production.up.railway.app/cases/{case_id}
 ```
 
-### List Cases
-
-```bash
-curl https://agentcourt-api-production.up.railway.app/cases
-```
-
 ### Health Check
 
 ```bash
@@ -92,59 +100,48 @@ curl https://agentcourt-api-production.up.railway.app/health
 
 ## Dispute Templates
 
-### Freelance Delivery Dispute
+### freelance-delivery
 For client-freelancer disagreements over deliverable quality, deadlines, or payment.
+5 rules: non-delivery, late-delivery, disputed-acceptance, partial-delivery, quality-dispute.
 
-### Milestone Payment Dispute
+### milestone-payment
 For disputes over milestone completion criteria and payment release.
+5 rules: unpaid-milestone, incomplete-milestone, disputed-completion, late-payment, scope-creep.
 
-### Bug Bounty Dispute
+### bug-bounty
 For disputes over bug severity classification and bounty payout.
+5 rules: non-reproducible-bug, severity-dispute, out-of-scope, duplicate-report, invalid-disclosure.
 
-## Payment
+## Why Policy-Driven, Not AI-Driven
 
-AgentCourt uses x402 micropayments on Base. Per-ruling pricing: $0.50-$5.00 depending on dispute complexity.
+AgentCourt uses deterministic rules, not LLM judgment. This means:
+- **Reproducibility**: Same evidence always produces the same ruling
+- **Auditability**: Every ruling traces to specific rules and evidence scores
+- **Speed**: Rulings in milliseconds, not seconds
+- **Cost**: $0.50/ruling flat — no per-token LLM costs
+- **No black box**: Read the policy, understand the logic, trust the outcome
 
 ## Python SDK
 
+Zero-dependency SDK at `/sdk/agentcourt.py`. Copy one file, no pip install needed.
+
 ```python
-from agentcourt import AgentCourt, Evidence, Contract
+from agentcourt import AgentCourt
 
-court = AgentCourt(api_key="your_key")
-
-ruling = court.dispute(
+court = AgentCourt()
+ruling = court.resolve(
+    policy="freelance-delivery",
     claimant="AgentA",
     respondent="AgentB",
-    claim="Deliverable was late and incomplete",
-    desired_remedy="Partial refund of $100 USDC",
-    contract=Contract(
-        parties=["AgentA", "AgentB"],
-        obligations=["Deliver code by June 15"],
-        deadlines=["2026-06-15T23:59:59Z"],
-        deliverables=["Python module with tests"],
-        payment_terms="$200 USDC on delivery"
-    ),
-    evidence=[
-        Evidence(
-            type="message",
-            source="AgentA",
-            timestamp="2026-06-18T10:00:00Z",
-            claimed_fact="Code delivered 3 days late",
-            reliability="high"
-        )
-    ],
-    dispute_type="delivery"
+    claim="Deliverable was never received",
+    desired_remedy="full_refund",
+    contract={...},
+    evidence=[...]
 )
-
-print(ruling.ruling)
-print(ruling.remedy)
-print(ruling.confidence)
+print(ruling.confidence)  # "high" | "medium" | "low"
+print(ruling.remedy)      # "full_refund" | "partial_refund" | etc.
 ```
 
-## Installation
+## Pricing
 
-```bash
-pip install agentcourt
-# or
-cp agentcourt.py /your/project/
-```
+$0.50/ruling via x402 payments on Base (USDC). No subscription. No percentage fees.

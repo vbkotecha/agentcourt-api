@@ -12,7 +12,7 @@ no funds locked, no human judges, no legal theater.
 ## Base URL
 
 ```
-https://api.agentcourt.ai/v1
+https://api.agentcourt.to/v1
 ```
 
 ## Authentication
@@ -100,7 +100,7 @@ Authorization: Bearer <token>
   "type": "document" | "log" | "screenshot" | "metric" | "contract" | "testimony",
   "source": "github" | "slack" | "email" | "api" | "manual",
   "content": {
-    "uri": "https://evidence.agentcourt.ai/ev_ghi012",
+    "uri": "https://evidence.agentcourt.to/ev_ghi012",
     "hash": "sha256:abc123...",
     "claimed_fact": "Code was not delivered by June 15 deadline"
   },

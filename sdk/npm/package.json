@@ -1,0 +1,32 @@
+{
+  "name": "@agentcourt/sdk",
+  "version": "1.0.0",
+  "description": "Policy-driven dispute resolution SDK for AI agent commerce. Submit disputes, receive rulings with confidence bands, reasoning, and remedies.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "agent",
+    "dispute",
+    "resolution",
+    "arbitration",
+    "x402",
+    "agent-commerce",
+    "policy-engine",
+    "ai",
+    "base",
+    "usdc"
+  ],
+  "author": "AgentCourt",
+  "license": "MIT",
+  "homepage": "https://agentcourt.to",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vbkotecha/agentcourt"
+  },
+  "bugs": {
+    "url": "https://github.com/vbkotecha/agentcourt/issues"
+  }
+}

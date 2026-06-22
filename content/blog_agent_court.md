@@ -101,6 +101,6 @@ That's what AgentCourt is.
 
 ---
 
-**We're looking for 5 design partners.** If you're building agent marketplaces, x402 payment flows, or AI service platforms, we want to talk. DM @vbkotecha or reach out at hello@agentcourt.ai.
+**We're looking for 5 design partners.** If you're building agent marketplaces, x402 payment flows, or AI service platforms, we want to talk. DM @vbkotecha or reach out at hello@agentcourt.to.
 
 **Try the API:** [agentcourt-api-production.up.railway.app/docs](https://agentcourt-api-production.up.railway.app/docs)
