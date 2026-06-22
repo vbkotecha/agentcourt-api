@@ -1,0 +1,96 @@
+{
+  "name": "api-quality",
+  "version": "1.0",
+  "description": "Dispute resolution for API quality issues — wrong data, schema mismatch, service errors on paid x402/MPP API calls",
+  "rules": [
+    {
+      "id": "schema-mismatch",
+      "condition": "response_received == true AND\nschema_matches == false\n",
+      "ruling_template": "The API response does not match its declared OpenAPI schema.\nEndpoint: {endpoint}\nExpected: {expected_type}\nReceived: {actual_type}\nField: {mismatched_field}\n\nThe response is structurally invalid. Full refund owed.\n",
+      "confidence": "high",
+      "remedy": "full_refund",
+      "facts_required": [
+        "response_received",
+        "schema_matches",
+        "mismatched_field",
+        "expected_type",
+        "actual_type"
+      ]
+    },
+    {
+      "id": "empty-response",
+      "condition": "response_received == true AND\nresponse_is_empty == true AND\nhttp_status == 200\n",
+      "ruling_template": "The API returned HTTP 200 with an empty or null response body.\nEndpoint: {endpoint}\nAmount paid: {amount_paid}\n\nA successful response must contain data. Full refund owed.\n",
+      "confidence": "high",
+      "remedy": "full_refund",
+      "facts_required": [
+        "response_received",
+        "response_is_empty",
+        "http_status"
+      ]
+    },
+    {
+      "id": "wrong-data-type",
+      "condition": "response_received == true AND\nschema_matches == true AND\ndata_type_correct == false\n",
+      "ruling_template": "The API response matches the schema structure but contains wrong data types.\nField: {mismatched_field}\nExpected type: {expected_type}\nActual value: {actual_value}\n\nThe data is technically valid but semantically incorrect. Full refund owed.\n",
+      "confidence": "medium",
+      "remedy": "full_refund",
+      "facts_required": [
+        "response_received",
+        "schema_matches",
+        "data_type_correct",
+        "mismatched_field"
+      ]
+    },
+    {
+      "id": "partial-response",
+      "condition": "response_received == true AND\nrequired_fields_missing == true\n",
+      "ruling_template": "The API response is missing required fields declared in the OpenAPI schema.\nMissing fields: {missing_fields}\nEndpoint: {endpoint}\n\nPartial data delivery. Partial refund owed.\n",
+      "confidence": "medium",
+      "remedy": "partial_refund",
+      "facts_required": [
+        "response_received",
+        "required_fields_missing",
+        "missing_fields"
+      ]
+    },
+    {
+      "id": "service-unavailable",
+      "condition": "payment_was_charged == true AND\nhttp_status >= 500\n",
+      "ruling_template": "The API charged for the request but returned a server error.\nHTTP Status: {http_status}\nError: {error_message}\nEndpoint: {endpoint}\n\nService was unavailable. Full refund owed.\n",
+      "confidence": "high",
+      "remedy": "full_refund",
+      "facts_required": [
+        "payment_was_charged",
+        "http_status",
+        "error_message"
+      ]
+    },
+    {
+      "id": "stale-data",
+      "condition": "response_received == true AND\ndata_freshness_acceptable == false AND\ndeclared_freshness != null\n",
+      "ruling_template": "The API returned data older than its declared freshness window.\nDeclared freshness: {declared_freshness}\nActual data age: {actual_age}\nEndpoint: {endpoint}\n\nData does not meet freshness expectations. Partial refund owed.\n",
+      "confidence": "medium",
+      "remedy": "partial_refund",
+      "facts_required": [
+        "response_received",
+        "data_freshness_acceptable",
+        "declared_freshness",
+        "actual_age"
+      ]
+    },
+    {
+      "id": "valid-response",
+      "condition": "response_received == true AND\nschema_matches == true AND\nrequired_fields_missing == false AND\nhttp_status == 200\n",
+      "ruling_template": "The API response is valid.\nSchema matches. All required fields present. HTTP 200.\nNo remedy is owed.\n",
+      "confidence": "high",
+      "remedy": "none",
+      "facts_required": [
+        "response_received",
+        "schema_matches",
+        "required_fields_missing",
+        "http_status"
+      ]
+    }
+  ]
+}
