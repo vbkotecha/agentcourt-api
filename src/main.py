@@ -316,6 +316,30 @@ async def get_openapi_spec():
     raise HTTPException(status_code=404, detail="OpenAPI spec not found")
 
 
+@app.get("/swagger", response_class=HTMLResponse)
+async def swagger_ui():
+    """Interactive Swagger UI for exploring the API."""
+    return """<!DOCTYPE html>
+<html><head>
+<title>AgentCourt — Swagger UI</title>
+<link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css">
+<style>body { margin: 0; }</style>
+</head><body>
+<div id="swagger-ui"></div>
+<script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js"></script>
+<script>
+window.onload = function() {
+  SwaggerUIBundle({
+    url: '/openapi.yaml',
+    dom_id: '#swagger-ui',
+    deepLinking: true,
+    tryItOutEnabled: true,
+  });
+};
+</script>
+</body></html>"""
+
+
 @app.get("/v1/verdicts")
 async def list_verdicts(limit: int = 50):
     """Public verdict dashboard — returns all resolved cases."""
