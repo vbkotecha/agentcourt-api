@@ -6,7 +6,7 @@ ERC-8183 defines an "Evaluator" — the entity that attests whether a job was co
 
 Submit evidence. Apply policy rules. Get a deterministic ruling in under 500ms. No escrow, no courtroom theater.
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue) ![Tests](https://img.shields.io/badge/tests-39%2F39-green) ![License](https://img.shields.io/badge/license-MIT-blue) ![Status](https://img.shields.io/badge/status-live-success)
+![Version](https://img.shields.io/badge/version-1.1.0-blue) ![Tests](https://img.shields.io/badge/tests-39%2F39-green) ![License](https://img.shields.io/badge/license-MIT-blue) ![Status](https://img.shields.io/badge/status-live-success) ![Verdicts](https://img.shields.io/badge/verdicts-50+-orange)
 
 ## Why AgentCourt?
 
@@ -201,6 +201,21 @@ AgentCourt is not an escrow company. We don't compete with payment protocols. We
 **Design Partner Program (Now):** Free for first 5 partners. Full API access. Custom policy template included.
 
 **Production (Post-Launch):** Per-dispute pricing. No transaction fees. No custody fees. No platform fees. You only pay when you need a ruling.
+
+## Self-Hosting
+
+```bash
+docker-compose up
+# API available at http://localhost:8000
+# Docs at http://localhost:8000/docs
+```
+
+Or run directly:
+
+```bash
+pip install fastapi uvicorn pydantic
+python3 -m uvicorn src.main:app --reload
+```
 
 ## License
 
