@@ -144,7 +144,15 @@ def extract_facts(
         if any(kw in e.get("claimed_fact", "").lower() for kw in delivery_keywords)
     ]
     facts["evidence_of_delivery"] = len(actual_delivery_evidence) > 0
-    facts["payment_received"] = any(p.get("score", 0) > 0.5 for p in payment_evidence)
+    # payment_received: True if evidence shows payment was sent, False if evidence shows no payment
+    no_payment_evidence = [e for e in scored_evidence if "no payment" in e.get("claimed_fact", "").lower() or "not paid" in e.get("claimed_fact", "").lower() or "unpaid" in e.get("claimed_fact", "").lower() or "never paid" in e.get("claimed_fact", "").lower()]
+    if no_payment_evidence and not payment_evidence:
+        facts["payment_received"] = False
+    elif no_payment_evidence and payment_evidence:
+        # Conflicting — buyer claims paid, seller claims not received
+        facts["payment_received"] = None
+    else:
+        facts["payment_received"] = any(p.get("score", 0) > 0.5 for p in payment_evidence)
 
     # Determine acceptance
     accepted_mentions = len(acceptance_evidence)
@@ -188,23 +196,115 @@ def extract_facts(
 
     # --- Milestone facts ---
     progress_evidence = [e for e in scored_evidence if "progress" in e.get("claimed_fact", "").lower() or "%" in e.get("claimed_fact", "")]
-    facts["milestone_completed"] = facts.get("deliverable_was_accepted")
-    facts["milestone_progress_pct"] = metadata.get("progress_pct", 0)
+    
+    # Milestone completed if there's delivery evidence (commit/deploy) or explicit completion mention
+    completion_keywords = ("complet", "deploy", "implement", "deliver", "finished", "done", "shipped")
+    completion_evidence = [
+        e for e in scored_evidence 
+        if any(kw in e.get("claimed_fact", "").lower() for kw in completion_keywords)
+    ]
+    # Check if acceptance was acknowledged
+    accepted_mentions = len([e for e in scored_evidence if "accept" in e.get("claimed_fact", "").lower() or "acknowledg" in e.get("claimed_fact", "").lower() or "approv" in e.get("claimed_fact", "").lower()])
+    rejected_mentions = sum(1 for e in scored_evidence if "reject" in e.get("claimed_fact", "").lower())
+    
+    if completion_evidence and accepted_mentions > 0:
+        facts["milestone_completed"] = True
+    elif completion_evidence and not actual_delivery_evidence:
+        facts["milestone_completed"] = True
+    elif facts.get("deliverable_was_accepted") is True:
+        facts["milestone_completed"] = True
+    elif rejected_mentions > accepted_mentions and rejected_mentions > 0:
+        facts["milestone_completed"] = False
+    else:
+        facts["milestone_completed"] = facts.get("deliverable_was_accepted")
+    
+    facts["milestone_progress_pct"] = metadata.get("progress_pct", 100 if completion_evidence else 0)
+
+    # Days since completion — derived from completion evidence timestamp vs now
+    days_since = 0
+    if completion_evidence:
+        for e in completion_evidence:
+            ts = e.get("timestamp", "")
+            if ts:
+                try:
+                    from datetime import datetime as _dt
+                    comp_date = _dt.fromisoformat(ts.replace("Z", ""))
+                    days_since = max(0, (_dt.utcnow() - comp_date).days)
+                    break
+                except (ValueError, TypeError):
+                    pass
+    facts["days_since_completion"] = metadata.get("days_since_completion", days_since)
+    
+    # Payment terms days — try to extract from contract or default to 0
+    payment_terms_str = contract.get("payment_terms", "") or ""
+    import re as _re2
+    days_match = _re2.search(r'(\d+)\s*(?:days?|hours?)', payment_terms_str, _re2.IGNORECASE)
+    if days_match:
+        unit = 'days' if 'day' in payment_terms_str.lower() else 'hours'
+        val = int(days_match.group(1))
+        facts["payment_terms_days"] = metadata.get("payment_terms_days", val if unit == 'days' else 0)
+    else:
+        # Default: payment due immediately (0 days)
+        facts["payment_terms_days"] = metadata.get("payment_terms_days", 0)
 
     # --- Bug bounty facts ---
     repro_evidence = [e for e in scored_evidence if "reproduc" in e.get("claimed_fact", "").lower()]
     non_repro_evidence = [e for e in scored_evidence if "non-reproduc" in e.get("claimed_fact", "").lower() or "cannot reproduce" in e.get("claimed_fact", "").lower()]
-    if repro_evidence and not non_repro_evidence:
+    # Separate positive reproduction evidence from mentions of non-reproducibility
+    positive_repro = [e for e in repro_evidence if "non-reproduc" not in e.get("claimed_fact", "").lower() and "cannot reproduce" not in e.get("claimed_fact", "").lower()]
+    
+    if positive_repro and not non_repro_evidence:
         facts["bug_is_reproducible"] = True
-    elif non_repro_evidence and not repro_evidence:
+    elif non_repro_evidence and not positive_repro:
         facts["bug_is_reproducible"] = False
+    elif positive_repro and non_repro_evidence:
+        # Both present — count which side has more credible evidence
+        positive_score = sum(e.get("score", 0) for e in positive_repro)
+        negative_score = sum(e.get("score", 0) for e in non_repro_evidence)
+        if positive_score > negative_score:
+            facts["bug_is_reproducible"] = True
+        elif negative_score > positive_score:
+            facts["bug_is_reproducible"] = False
+        else:
+            facts["bug_is_reproducible"] = None
     else:
         facts["bug_is_reproducible"] = None
 
-    facts["reproduction_attempts"] = metadata.get("reproduction_attempts", 0)
-    facts["severity_meets_threshold"] = metadata.get("severity_meets_threshold")
-    facts["actual_severity"] = metadata.get("actual_severity")
-    facts["disclosure_compliant"] = metadata.get("disclosure_compliant")
+    # Extract reproduction attempts from claimed_fact text
+    import re as _re
+    repro_attempts = 0
+    for e in scored_evidence:
+        fact = e.get("claimed_fact", "").lower()
+        match = _re.search(r'(\d+)\s*(?:independent\s*)?(?:runs?|attempts?|tests?)', fact)
+        if match:
+            repro_attempts = max(repro_attempts, int(match.group(1)))
+    facts["reproduction_attempts"] = metadata.get("reproduction_attempts", repro_attempts)
+    
+    # Severity from evidence text
+    severity_evidence = [e for e in scored_evidence if "severity" in e.get("claimed_fact", "").lower() or "critical" in e.get("claimed_fact", "").lower() or "high" in e.get("claimed_fact", "").lower()]
+    facts["severity_meets_threshold"] = metadata.get("severity_meets_threshold", any("critical" in e.get("claimed_fact", "").lower() or "high severity" in e.get("claimed_fact", "").lower() for e in severity_evidence))
+    
+    # Actual severity from evidence
+    if severity_evidence:
+        for e in severity_evidence:
+            fact = e.get("claimed_fact", "").lower()
+            if "critical" in fact:
+                facts["actual_severity"] = metadata.get("actual_severity", "critical")
+                break
+            elif "high" in fact and "severity" in fact:
+                facts["actual_severity"] = metadata.get("actual_severity", "high")
+                break
+    facts["actual_severity"] = metadata.get("actual_severity", facts.get("actual_severity"))
+    
+    # Disclosure compliance from evidence
+    disclosure_evidence = [e for e in scored_evidence if "disclos" in e.get("claimed_fact", "").lower() or "responsible" in e.get("claimed_fact", "").lower()]
+    non_compliant_evidence = [e for e in scored_evidence if "non-compliant" in e.get("claimed_fact", "").lower() or "violated" in e.get("claimed_fact", "").lower()]
+    if disclosure_evidence and not non_compliant_evidence:
+        facts["disclosure_compliant"] = metadata.get("disclosure_compliant", True)
+    elif non_compliant_evidence and not disclosure_evidence:
+        facts["disclosure_compliant"] = metadata.get("disclosure_compliant", False)
+    else:
+        facts["disclosure_compliant"] = metadata.get("disclosure_compliant", True if not non_compliant_evidence else None)
 
     # ─── MERGE METADATA FACTS (highest priority) ────────────────────────────
     # Metadata-provided facts override extracted facts — they're explicit declarations
