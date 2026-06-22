@@ -1,0 +1,393 @@
+openapi: 3.0.3
+info:
+  title: AgentCourt API
+  version: 1.0.0
+  description: |
+    Policy-driven dispute resolution for agent commerce.
+    
+    Submit disputes across 4 policy templates (21 rules) and get 
+    deterministic, evidence-weighted rulings.
+    
+    ## Quick Start
+    ```python
+    from agentcourt import AgentCourt
+    court = AgentCourt()
+    ruling = court.dispute(
+        claimant="buyer",
+        respondent="seller",
+        contract={...},
+        claim="Non-delivery",
+        policy="freelance-delivery",
+        evidence=[...]
+    )
+    ```
+  contact:
+    name: AgentCourt
+    url: https://agentcourt-api-production.up.railway.app
+  license:
+    name: MIT
+
+servers:
+  - url: https://agentcourt-api-production.up.railway.app
+    description: Production
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Verify API is live
+      operationId: healthCheck
+      tags: [System]
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  version:
+                    type: string
+                    example: "1.0.0"
+
+  /v1/policies:
+    get:
+      summary: List all policy templates
+      description: Returns all available dispute resolution policy templates
+      operationId: listPolicies
+      tags: [Policies]
+      responses:
+        '200':
+          description: List of policy templates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 4
+                  policies:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PolicySummary'
+
+  /v1/policies/{name}:
+    get:
+      summary: Get a specific policy template
+      description: Returns full policy definition with all rules
+      operationId: getPolicy
+      tags: [Policies]
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [freelance-delivery, milestone-payment, bug-bounty, sla-monitoring]
+      responses:
+        '200':
+          description: Full policy template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+        '404':
+          description: Policy not found
+
+  /v1/disputes:
+    post:
+      summary: Submit a dispute
+      description: |
+        Submit a dispute with evidence and get a deterministic ruling.
+        
+        The engine extracts facts from evidence, matches against policy rules,
+        and returns a ruling with confidence, remedy, and reasoning.
+      operationId: submitDispute
+      tags: [Disputes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisputeRequest'
+            examples:
+              freelance_non_delivery:
+                summary: Freelance non-delivery dispute
+                value:
+                  claimant: buyer_agent
+                  respondent: seller_agent
+                  contract:
+                    parties: [buyer_agent, seller_agent]
+                    obligations: [Deliver logo design by June 20]
+                    deadlines: ["2026-06-20"]
+                    deliverables: [3 logo concepts]
+                    payment_terms: 10 USDC on delivery
+                  claim: Deliverable was never received.
+                  desired_remedy: full_refund
+                  policy: freelance-delivery
+                  evidence:
+                    - type: contract
+                      source: agreement.json
+                      timestamp: "2026-06-15"
+                      claimed_fact: Seller must deliver 3 logo concepts by June 20
+                    - type: payment_proof
+                      source: x402_receipt
+                      timestamp: "2026-06-15"
+                      claimed_fact: Buyer paid 10 USDC upfront
+                    - type: log
+                      source: design_tool
+                      timestamp: "2026-06-22"
+                      claimed_fact: No design files exported or delivered
+              sla_breach:
+                summary: SLA uptime violation
+                value:
+                  claimant: api_consumer
+                  respondent: api_provider
+                  contract:
+                    parties: [api_consumer, api_provider]
+                    obligations: [Maintain 99.9% uptime SLA]
+                    payment_terms: 500 USDC/month with SLA credits
+                  claim: Uptime fell below 99.9% SLA.
+                  desired_remedy: service_credit
+                  policy: sla-monitoring
+                  evidence:
+                    - type: contract
+                      source: agreement.json
+                      timestamp: "2026-06-01"
+                      claimed_fact: Provider agrees to 99.9% uptime SLA
+                    - type: log
+                      source: uptime_monitor
+                      timestamp: "2026-06-22"
+                      claimed_fact: Measured actual uptime of 98.2% during June monitoring period
+      responses:
+        '200':
+          description: Dispute resolved with ruling
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ruling'
+
+  /v1/verdicts:
+    get:
+      summary: List all public verdicts
+      description: Returns verdict dashboard data showing all resolved disputes
+      operationId: listVerdicts
+      tags: [Verdicts]
+      responses:
+        '200':
+          description: List of all verdicts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 21
+                  verdicts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VerdictSummary'
+
+components:
+  schemas:
+    DisputeRequest:
+      type: object
+      required: [claimant, respondent, contract, claim, policy, evidence]
+      properties:
+        claimant:
+          type: string
+          description: Party filing the dispute
+          example: buyer_agent
+        respondent:
+          type: string
+          description: Party the dispute is filed against
+          example: seller_agent
+        contract:
+          $ref: '#/components/schemas/Contract'
+        claim:
+          type: string
+          description: What happened (natural language)
+          example: Deliverable was never received.
+        desired_remedy:
+          type: string
+          description: What the claimant wants
+          example: full_refund
+        policy:
+          type: string
+          enum: [freelance-delivery, milestone-payment, bug-bounty, sla-monitoring]
+          description: Which policy template to apply
+        evidence:
+          type: array
+          items:
+            $ref: '#/components/schemas/Evidence'
+        metadata:
+          type: object
+          description: Optional explicit facts that override extraction
+
+    Contract:
+      type: object
+      properties:
+        parties:
+          type: array
+          items:
+            type: string
+        obligations:
+          type: array
+          items:
+            type: string
+        deadlines:
+          type: array
+          items:
+            type: string
+            description: ISO date string
+        deliverables:
+          type: array
+          items:
+            type: string
+        payment_terms:
+          type: string
+          example: 10 USDC on delivery
+
+    Evidence:
+      type: object
+      required: [type, source, timestamp, claimed_fact]
+      properties:
+        type:
+          type: string
+          description: Evidence type (determines weight)
+          enum: [contract, payment_proof, payment, invoice, receipt, commit, log, file, message, screenshot, testimonial, claim]
+        source:
+          type: string
+          description: Where the evidence came from
+          example: agreement.json
+        timestamp:
+          type: string
+          format: date
+          example: "2026-06-15"
+        claimed_fact:
+          type: string
+          description: What this evidence proves
+          example: Seller must deliver 3 logo concepts by June 20
+        content_hash:
+          type: string
+          description: Hash of the evidence content (adds +0.1 confidence)
+          example: sha256:abc123...
+        reliability:
+          type: string
+          enum: [high, medium, low]
+          default: medium
+
+    Ruling:
+      type: object
+      properties:
+        case_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          example: resolved
+        matched_rule_id:
+          type: string
+          description: Which policy rule matched
+          example: non-delivery
+        confidence:
+          type: string
+          enum: [high, medium, low]
+          description: Confidence in the ruling
+        ruling:
+          type: string
+          description: Human-readable ruling text
+        reasoning:
+          type: string
+          description: Why this rule matched
+        remedy:
+          type: string
+          description: Recommended action
+          example: full_refund
+        facts_established:
+          type: array
+          items:
+            type: object
+            properties:
+              fact:
+                type: string
+              value:
+                type: string
+        facts_disputed:
+          type: array
+          items:
+            type: object
+            properties:
+              fact:
+                type: string
+              value:
+                type: string
+        facts_unknown:
+          type: array
+          items:
+            type: object
+            properties:
+              fact:
+                type: string
+              reason:
+                type: string
+
+    PolicySummary:
+      type: object
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        rule_count:
+          type: integer
+        description:
+          type: string
+
+    Policy:
+      type: object
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+        rules:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              condition:
+                type: string
+              confidence:
+                type: string
+              remedy:
+                type: string
+
+    VerdictSummary:
+      type: object
+      properties:
+        case_id:
+          type: string
+        claimant:
+          type: string
+        respondent:
+          type: string
+        policy:
+          type: string
+        matched_rule:
+          type: string
+        confidence:
+          type: string
+        remedy:
+          type: string
+        timestamp:
+          type: string
