@@ -2,7 +2,18 @@
 
 **The dispute layer for agent commerce.**
 
-Submit evidence. Apply policy rules. Get a ruling. No escrow, no courtroom theater.
+Visa, Mastercard, and Google are building payment rails for AI agents (ACP, UCP, AP2, x402). Nobody is building the dispute resolution layer. That's us.
+
+Submit evidence. Apply policy rules. Get a deterministic ruling. No escrow, no courtroom theater.
+
+## Why AgentCourt?
+
+The agent commerce stack has three layers:
+1. **Transport** — A2A, MCP (how agents talk)
+2. **Payment** — x402, AP2, Visa Intelligent Commerce (how agents pay)
+3. **Dispute** — **AgentCourt** (what happens when something goes wrong)
+
+When an agent misfires, hallucinates a product, breaches an SLA, or delivers partial work — who resolves it? The existing card network dispute process wasn't designed for agent-initiated transactions. AgentCourt is purpose-built for this.
 
 ## Live API
 
