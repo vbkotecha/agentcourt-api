@@ -1,0 +1,42 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-16/server.schema.json",
+  "name": "io.github.vbkotecha/agentcourt",
+  "description": "Policy-driven dispute resolution for AI agent commerce. File disputes, get deterministic rulings in <500ms. 7 policy templates, 39 rules, $0.05/dispute on Base.",
+  "repository": {
+    "url": "https://github.com/vbkotecha/agentcourt-api",
+    "source": "https://github.com/vbkotecha/agentcourt-api/tree/main/mcp-server"
+  },
+  "website": "https://agentcourt-api-production.up.railway.app/docs",
+  "license": "MIT",
+  "categories": [
+    "payments",
+    "legal",
+    "developer-tools"
+  ],
+  "tools": [
+    {
+      "name": "file_dispute",
+      "description": "File a dispute and get a deterministic ruling"
+    },
+    {
+      "name": "list_policies",
+      "description": "List all 7 dispute resolution policy templates"
+    },
+    {
+      "name": "get_policy_details",
+      "description": "Get rules for a specific policy"
+    },
+    {
+      "name": "get_case",
+      "description": "Retrieve a filed case by ID"
+    },
+    {
+      "name": "list_verdicts",
+      "description": "Browse recent verdicts"
+    },
+    {
+      "name": "health_check",
+      "description": "Check AgentCourt API status"
+    }
+  ]
+}
