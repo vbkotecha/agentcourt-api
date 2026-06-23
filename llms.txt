@@ -1,0 +1,73 @@
+# AgentCourt
+
+> The Evaluator layer for agent commerce.
+
+AgentCourt is a policy-driven dispute resolution API for agent commerce. When a transaction between AI agents goes wrong — bad API response, non-delivery, SLA breach — AgentCourt evaluates the evidence and issues a deterministic ruling in under 500ms. No escrow, no courtroom theater.
+
+## Live API
+
+- Base URL: https://agentcourt-api-production.up.railway.app
+- Interactive Docs: https://agentcourt-api-production.up.railway.app/docs
+- Health Check: https://agentcourt-api-production.up.railway.app/health
+- GitHub: https://github.com/vbkotecha/agentcourt-api
+
+## What It Does
+
+1. Submit evidence (contracts, logs, API responses, screenshots, payment records)
+2. Apply policy rules (deterministic evaluation against predefined templates)
+3. Get a ruling (remedy, confidence band, full audit trail)
+
+The ruling is deterministic: same evidence + same policy = same ruling. Every time.
+
+## Policies Available
+
+- freelance-delivery: Non-delivery, late delivery, partial delivery (5 rules)
+- milestone-payment: Unpaid milestones, overdue, partial payments (6 rules)
+- bug-bounty: Reproducibility, severity, disclosure compliance (5 rules)
+- sla-monitoring: Uptime, latency, degraded service (6 rules)
+- api-quality: Schema mismatch, wrong types, stale data, missing fields (6 rules)
+- physical-commerce: Wrong item, damage, non-delivery, returns (6 rules)
+
+## Pricing
+
+$0.05/dispute via x402 (USDC on Base). Free tier currently available.
+
+## Quick Example
+
+```bash
+curl -X POST https://agentcourt-api-production.up.railway.app/v1/disputes \
+  -H "Content-Type: application/json" \
+  -d '{
+    "policy": "api-quality",
+    "claim": "Schema mismatch",
+    "claimant": "agent",
+    "respondent": "api",
+    "desired_remedy": "full_refund",
+    "contract": {"parties": ["agent", "api"], "obligations": ["Match schema"]},
+    "metadata": {"response_received": true, "schema_matches": false},
+    "evidence": [{"type": "log", "source": "resp.json", "timestamp": "2026-06-22", "claimed_fact": "Wrong type returned"}]
+  }'
+```
+
+## SDKs
+
+- Python: https://github.com/vbkotecha/agentcourt-api/blob/main/sdk/agentcourt_python_sdk.py
+- JavaScript: https://github.com/vbkotecha/agentcourt-api/blob/main/sdk/agentcourt.js
+- TypeScript: https://github.com/vbkotecha/agentcourt-api/blob/main/sdk/agentcourt.d.ts
+
+## Standards
+
+- ERC-8183: AgentCourt fulfills the "Evaluator" role
+- ADRP: Implements Layers 1-3 of IETF draft-stone-adrp-00
+- x402: $0.05/dispute via USDC on Base, x402scan indexed (16 endpoints)
+
+## Self-Hosting
+
+```bash
+docker-compose up
+# API at http://localhost:8000
+```
+
+## License
+
+MIT
