@@ -1,0 +1,38 @@
+{
+  "name": "@agentcourt/mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for AgentCourt — policy-driven dispute resolution for AI agent commerce",
+  "main": "server.py",
+  "bin": {
+    "agentcourt-mcp": "./server.py"
+  },
+  "scripts": {
+    "start": "python server.py"
+  },
+  "keywords": [
+    "mcp",
+    "agentcourt",
+    "dispute-resolution",
+    "agent-commerce",
+    "x402",
+    "ai-agents",
+    "arbitration",
+    "base",
+    "usdc"
+  ],
+  "author": "Vivek Kotecha",
+  "license": "MIT",
+  "homepage": "https://github.com/vbkotecha/agentcourt-api",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vbkotecha/agentcourt-api.git",
+    "directory": "mcp-server"
+  },
+  "engines": {
+    "python": ">=3.10"
+  },
+  "dependencies": {
+    "mcp": ">=0.1.0",
+    "httpx": ">=0.24.0"
+  }
+}
