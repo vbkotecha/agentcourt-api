@@ -14,6 +14,8 @@ Submit evidence. Apply policy rules. Get a deterministic ruling in under 500ms. 
 > **Integration Examples**: [LangChain, CrewAI, Node.js](https://github.com/vbkotecha/agentcourt-api/tree/main/examples)
 > **Architecture**: [Design Document](https://github.com/vbkotecha/agentcourt-api/blob/main/docs/architecture.md)
 > **Comparison**: [AgentCourt vs Arbitova](https://github.com/vbkotecha/agentcourt-api/blob/main/docs/comparison.md)
+> **API Examples**: [All 7 Policies](https://github.com/vbkotecha/agentcourt-api/blob/main/docs/API_EXAMPLES.md)
+> **Python SDK**: `pip install agentcourt` | **JS SDK**: `npm install @agentcourt/sdk`
 
 ## Why AgentCourt?
 
