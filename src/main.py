@@ -39,7 +39,7 @@ from engine.policy_engine import (
 
 app = FastAPI(
     title="AgentCourt",
-    version="1.0.0",
+    version="1.2.0",
     description="Policy-driven dispute resolution protocol for agent commerce",
 )
 
@@ -110,7 +110,7 @@ class RulingResponse(BaseModel):
     policy_version: Optional[str] = None
     evidence_scores: Optional[List[dict]] = None
     ruled_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
-    engine_version: str = "1.0.0"
+    engine_version: str = "1.2.0"
 
 
 # ─── Storage ─────────────────────────────────────────────────────────────────
@@ -264,7 +264,7 @@ async def root():
     return {
         "name": "AgentCourt",
         "tagline": "The dispute layer for agent commerce",
-        "version": "1.0.0",
+        "version": "1.2.0",
         "endpoints": {
             "submit_dispute": "POST /v1/disputes",
             "list_policies": "GET /v1/policies",
