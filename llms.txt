@@ -27,6 +27,7 @@ The ruling is deterministic: same evidence + same policy = same ruling. Every ti
 - sla-monitoring: Uptime, latency, degraded service (6 rules)
 - api-quality: Schema mismatch, wrong types, stale data, missing fields (6 rules)
 - physical-commerce: Wrong item, damage, non-delivery, returns (6 rules)
+- scope-dispute: Budget exceedance, scope creep, unauthorized changes (4 rules)
 
 ## Pricing
 
