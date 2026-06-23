@@ -11,6 +11,7 @@ Submit evidence. Apply policy rules. Get a deterministic ruling in under 500ms. 
 > **Live API**: [agentcourt-api-production.up.railway.app/docs](https://agentcourt-api-production.up.railway.app/docs)
 > **Landing Page**: [vbkotecha.github.io/agentcourt-api](https://vbkotecha.github.io/agentcourt-api/)
 > **Tutorial**: [File Your First Dispute](https://github.com/vbkotecha/agentcourt-api/discussions/2)
+> **Integration Examples**: [LangChain, CrewAI, Node.js](https://github.com/vbkotecha/agentcourt-api/tree/main/examples)
 
 ## Why AgentCourt?
 
