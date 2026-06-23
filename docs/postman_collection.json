@@ -1,0 +1,145 @@
+{
+  "info": {
+    "name": "AgentCourt API",
+    "description": "Policy-driven dispute resolution API for AI agent commerce.\n\nBase URL: https://agentcourt-api-production.up.railway.app\nDocs: https://agentcourt-api-production.up.railway.app/docs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://agentcourt-api-production.up.railway.app",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/health",
+        "description": "Check API status, version, and available policies"
+      }
+    },
+    {
+      "name": "File Dispute (API Quality)",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/v1/disputes",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"policy\": \"api-quality\",\n  \"claim\": \"API returned XML instead of JSON\",\n  \"desired_remedy\": \"full_refund\",\n  \"metadata\": {\n    \"response_received\": true,\n    \"schema_matches\": false\n  }\n}"
+        },
+        "description": "File an API quality dispute and get a ruling"
+      }
+    },
+    {
+      "name": "File Dispute (Freelance Delivery)",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/v1/disputes",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"policy\": \"freelance-delivery\",\n  \"claim\": \"Deliverable never received\",\n  \"desired_remedy\": \"full_refund\",\n  \"metadata\": {\n    \"delivered\": false,\n    \"deadline_passed\": true\n  }\n}"
+        }
+      }
+    },
+    {
+      "name": "File Dispute (SLA Monitoring)",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/v1/disputes",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"policy\": \"sla-monitoring\",\n  \"claim\": \"Uptime below 99.9% SLA\",\n  \"desired_remedy\": \"partial_refund\",\n  \"metadata\": {\n    \"uptime_percentage\": 97.5,\n    \"sla_threshold\": 99.9\n  }\n}"
+        }
+      }
+    },
+    {
+      "name": "File Dispute (Bug Bounty)",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/v1/disputes",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"policy\": \"bug-bounty\",\n  \"claim\": \"Critical bug report rejected unfairly\",\n  \"desired_remedy\": \"full_payout\",\n  \"metadata\": {\n    \"is_reproducible\": true,\n    \"severity\": \"critical\",\n    \"severity_threshold\": \"high\"\n  }\n}"
+        }
+      }
+    },
+    {
+      "name": "List Policies",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/v1/policies"
+      }
+    },
+    {
+      "name": "Get Policy Details",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/v1/policies/api-quality"
+      }
+    },
+    {
+      "name": "Preview Policy",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/v1/policies/api-quality/preview",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"metadata\": {\n    \"response_received\": true,\n    \"schema_matches\": false\n  }\n}"
+        }
+      }
+    },
+    {
+      "name": "List Cases",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/v1/cases"
+      }
+    },
+    {
+      "name": "List Verdicts",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/v1/verdicts"
+      }
+    },
+    {
+      "name": "Agent Card (A2A)",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/.well-known/agent.json"
+      }
+    }
+  ]
+}
