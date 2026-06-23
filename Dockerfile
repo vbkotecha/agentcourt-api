@@ -1,12 +1,17 @@
-FROM python:3.13-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install only what we need
+RUN pip install --no-cache-dir fastapi uvicorn[standard] pydantic
 
-COPY . .
+# Copy source
+COPY src/ ./src/
+COPY sdk/ ./sdk/
+COPY tests/ ./tests/
 
+# Expose port
 EXPOSE 8000
 
-CMD ["python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run
+CMD ["python3", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
