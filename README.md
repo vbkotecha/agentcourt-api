@@ -12,6 +12,8 @@ Submit evidence. Apply policy rules. Get a deterministic ruling in under 500ms. 
 > **Landing Page**: [vbkotecha.github.io/agentcourt-api](https://vbkotecha.github.io/agentcourt-api/)
 > **Tutorial**: [File Your First Dispute](https://github.com/vbkotecha/agentcourt-api/discussions/2)
 > **Integration Examples**: [LangChain, CrewAI, Node.js](https://github.com/vbkotecha/agentcourt-api/tree/main/examples)
+> **Architecture**: [Design Document](https://github.com/vbkotecha/agentcourt-api/blob/main/docs/architecture.md)
+> **Comparison**: [AgentCourt vs Arbitova](https://github.com/vbkotecha/agentcourt-api/blob/main/docs/comparison.md)
 
 ## Why AgentCourt?
 
