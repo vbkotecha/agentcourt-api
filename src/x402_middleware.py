@@ -54,7 +54,7 @@ def create_payment_challenge(resource: str = "/v1/disputes") -> dict:
     Create an x402 payment challenge response.
     Returns the 402 response body with payment requirements.
     """
-    wallet = os.environ.get("AGENTCOURT_WALLET_ADDRESS", "")
+    wallet = os.environ.get("AGENTCOURT_WALLET_ADDRESS", "0x9863aB6242663FCc84c33632741711dB78f8Fd15")
     if not wallet:
         return {
             "error": "Payment not configured",
