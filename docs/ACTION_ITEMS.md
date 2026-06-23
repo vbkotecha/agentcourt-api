@@ -23,6 +23,7 @@
 
 5. **Hashnode/Medium API key** — For publishing blog posts we've written
 6. **GitHub PAT with workflow scope** — Enable CI/CD workflow (8 tests ready in tests/)
+7. **Sign E2B CLA** — Unblocks awesome-ai-agents PR #1146 (28K stars). Sign at https://e2b.dev/docs/cla
 
 ## Done (no action needed)
 - ✅ 3 ecosystem aggregator PRs submitted
