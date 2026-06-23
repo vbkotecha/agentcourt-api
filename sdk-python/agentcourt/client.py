@@ -8,6 +8,8 @@ import json
 import urllib.request
 import urllib.error
 
+from .exceptions import PaymentRequiredError
+
 
 DEFAULT_BASE_URL = "https://agentcourt-api-production.up.railway.app"
 
@@ -118,6 +120,13 @@ class AgentCourt:
                 return json.loads(resp.read())
         except urllib.error.HTTPError as e:
             error_body = e.read().decode()
+            if e.code == 402:
+                challenge = e.headers.get("payment-required", "")
+                raise PaymentRequiredError(
+                    "Payment required. You may have exceeded the free tier (100 disputes/month). "
+                    "Include x402 payment or wait for monthly reset.",
+                    payment_challenge=challenge,
+                ) from e
             raise Exception(f"AgentCourt API error {e.code}: {error_body}") from e
 
     def file_dispute(
