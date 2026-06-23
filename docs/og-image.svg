@@ -1,0 +1,54 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#161b22;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  
+  <!-- Logo: scales of justice -->
+  <text x="600" y="130" font-size="72" text-anchor="middle">⚖️</text>
+  
+  <!-- Title -->
+  <text x="600" y="230" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
+        font-size="56" font-weight="700" fill="#58a6ff" text-anchor="middle">AgentCourt</text>
+  
+  <!-- Tagline -->
+  <text x="600" y="290" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
+        font-size="28" fill="#8b949e" text-anchor="middle">Dispute Resolution for AI Agent Commerce</text>
+  
+  <!-- Stats row -->
+  <g font-family="-apple-system, BlinkMacSystemFont, sans-serif">
+    <text x="240" y="400" font-size="48" font-weight="700" fill="#3fb950" text-anchor="middle">7</text>
+    <text x="240" y="430" font-size="16" fill="#8b949e" text-anchor="middle">POLICIES</text>
+    
+    <text x="440" y="400" font-size="48" font-weight="700" fill="#3fb950" text-anchor="middle">39</text>
+    <text x="440" y="430" font-size="16" fill="#8b949e" text-anchor="middle">RULES</text>
+    
+    <text x="640" y="400" font-size="48" font-weight="700" fill="#3fb950" text-anchor="middle">&lt;500ms</text>
+    <text x="640" y="430" font-size="16" fill="#8b949e" text-anchor="middle">RULINGS</text>
+    
+    <text x="860" y="400" font-size="48" font-weight="700" fill="#3fb950" text-anchor="middle">$0.05</text>
+    <text x="860" y="430" font-size="16" fill="#8b949e" text-anchor="middle">PER DISPUTE</text>
+  </g>
+  
+  <!-- Feature pills -->
+  <g font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16">
+    <rect x="320" y="480" width="120" height="36" rx="18" fill="#1f6feb22" stroke="#1f6feb"/>
+    <text x="380" y="503" fill="#58a6ff" text-anchor="middle">x402 Native</text>
+    
+    <rect x="460" y="480" width="90" height="36" rx="18" fill="#1f6feb22" stroke="#1f6feb"/>
+    <text x="505" y="503" fill="#58a6ff" text-anchor="middle">MCP</text>
+    
+    <rect x="570" y="480" width="100" height="36" rx="18" fill="#1f6feb22" stroke="#1f6feb"/>
+    <text x="620" y="503" fill="#58a6ff" text-anchor="middle">REST API</text>
+    
+    <rect x="690" y="480" width="160" height="36" rx="18" fill="#1f6feb22" stroke="#1f6feb"/>
+    <text x="770" y="503" fill="#58a6ff" text-anchor="middle">MIT Licensed</text>
+  </g>
+  
+  <!-- URL -->
+  <text x="600" y="580" font-family="-apple-system, BlinkMacSystemFont, sans-serif" 
+        font-size="20" fill="#484f58" text-anchor="middle">github.com/vbkotecha/agentcourt-api</text>
+</svg>
