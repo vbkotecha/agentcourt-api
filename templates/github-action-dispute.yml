@@ -1,0 +1,76 @@
+# AgentCourt GitHub Action
+# File a dispute automatically when an API check fails in CI/CD
+name: 'AgentCourt Dispute Check'
+description: 'File a dispute when agent commerce transactions fail in CI/CD'
+inputs:
+  api-url:
+    description: 'URL of the API to check'
+    required: true
+  expected-schema:
+    description: 'Expected JSON schema (JSON string)'
+    required: true
+  agentcourt-url:
+    description: 'AgentCourt API URL'
+    required: false
+    default: 'https://agentcourt-api-production.up.railway.app'
+runs:
+  using: 'composite'
+  steps:
+    - name: Check API and file dispute if needed
+      shell: python
+      run: |
+        import json, urllib.request, sys
+        
+        api_url = "${{ inputs.api-url }}"
+        expected_schema = json.loads("${{ inputs.expected-schema }}")
+        court_url = "${{ inputs.agentcourt-url }}"
+        
+        # Check the API
+        try:
+            resp = urllib.request.urlopen(api_url, timeout=10)
+            data = json.loads(resp.read())
+            schema_matches = all(k in data for k in expected_schema.keys())
+        except:
+            schema_matches = False
+            data = {}
+        
+        if not schema_matches:
+            print("⚠️ API schema mismatch detected. Filing dispute...")
+            dispute = {
+                "claimant": "ci-pipeline",
+                "respondent": api_url,
+                "contract": {
+                    "parties": ["ci-pipeline", api_url],
+                    "obligations": ["Return JSON with required fields"]
+                },
+                "claim": "API response schema mismatch in CI/CD",
+                "desired_remedy": "full_refund",
+                "evidence": [{
+                    "type": "log",
+                    "source": "github-actions",
+                    "timestamp": "2026-01-01T00:00:00Z",
+                    "claimed_fact": f"Schema mismatch. Got: {list(data.keys())}"
+                }],
+                "policy": "api-quality",
+                "metadata": {
+                    "response_received": True,
+                    "schema_matches": False
+                }
+            }
+            
+            body = json.dumps(dispute).encode()
+            req = urllib.request.Request(
+                f"{court_url}/v1/disputes",
+                data=body,
+                headers={"Content-Type": "application/json"},
+                method="POST"
+            )
+            try:
+                resp = urllib.request.urlopen(req, timeout=10)
+                result = json.loads(resp.read())
+                print(f"Dispute filed. Ruling: {result.get('ruling', 'unknown')}")
+                print(f"Case ID: {result.get('case_id', 'N/A')}")
+            except Exception as e:
+                print(f"Could not file dispute: {e}")
+        else:
+            print("✅ API schema check passed")
