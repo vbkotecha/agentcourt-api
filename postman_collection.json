@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "AgentCourt API",
-    "description": "Policy-driven dispute resolution for agent commerce.\n\nLive API: https://agentcourt-api-production.up.railway.app\nDocs: https://agentcourt-api-production.up.railway.app/docs\nGitHub: https://github.com/vbkotecha/agentcourt-api",
+    "description": "Policy-driven dispute resolution API for agent commerce.\n\n7 policy templates | 39 rules | <500ms rulings | $0.05/dispute on Base\n\nBase URL: https://agentcourt-api-production.up.railway.app",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -16,148 +16,109 @@
       "name": "Health Check",
       "request": {
         "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/health",
-          "host": ["{{base_url}}"],
-          "path": ["health"]
-        }
-      },
-      "response": []
+        "url": "{{base_url}}/health",
+        "description": "Check API status and loaded policies"
+      }
     },
     {
       "name": "List Policies",
       "request": {
         "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/v1/policies",
-          "host": ["{{base_url}}"],
-          "path": ["v1", "policies"]
-        }
-      },
-      "response": []
+        "url": "{{base_url}}/v1/policies",
+        "description": "List all 7 available policy templates"
+      }
     },
     {
-      "name": "Get Policy Detail",
+      "name": "Get Policy Details (api-quality)",
       "request": {
         "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/v1/policies/freelance-delivery",
-          "host": ["{{base_url}}"],
-          "path": ["v1", "policies", "freelance-delivery"]
-        }
-      },
-      "response": []
+        "url": "{{base_url}}/v1/policies/api-quality",
+        "description": "Get rules for the api-quality policy"
+      }
     },
     {
-      "name": "Dispute: Freelance Non-Delivery",
+      "name": "File Dispute: API Schema Mismatch",
       "request": {
         "method": "POST",
+        "url": "{{base_url}}/v1/disputes",
         "header": [
           {"key": "Content-Type", "value": "application/json"}
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"claimant\": \"client_agent\",\n  \"respondent\": \"freelancer_bot\",\n  \"policy\": \"freelance-delivery\",\n  \"claim\": \"Logo design never delivered\",\n  \"desired_remedy\": \"full_refund\",\n  \"contract\": {\n    \"parties\": [\"client_agent\", \"freelancer_bot\"],\n    \"obligations\": [\"Deliver logo design by June 20\"],\n    \"deadlines\": [\"2026-06-20\"]\n  },\n  \"evidence\": [\n    {\n      \"type\": \"contract\",\n      \"source\": \"agreement.pdf\",\n      \"timestamp\": \"2026-06-01\",\n      \"claimed_fact\": \"Logo design deliverable due June 20\"\n    },\n    {\n      \"type\": \"log\",\n      \"source\": \"email_thread.pdf\",\n      \"timestamp\": \"2026-06-22\",\n      \"claimed_fact\": \"No deliverable was submitted by the deadline\"\n    },\n    {\n      \"type\": \"testimony\",\n      \"source\": \"witness_statement\",\n      \"timestamp\": \"2026-06-22\",\n      \"claimed_fact\": \"The respondent never delivered any work\"\n    }\n  ]\n}"
+          "raw": "{\n  \"policy\": \"api-quality\",\n  \"claim\": \"API returned XML instead of JSON\",\n  \"claimant\": \"buyer-agent\",\n  \"respondent\": \"seller-api\",\n  \"desired_remedy\": \"full_refund\",\n  \"contract\": {\n    \"parties\": [\"buyer-agent\", \"seller-api\"],\n    \"obligations\": [\"Return JSON response with fields: id, name, price\"]\n  },\n  \"metadata\": {\n    \"response_received\": true,\n    \"schema_matches\": false\n  },\n  \"evidence\": [\n    {\n      \"type\": \"log\",\n      \"source\": \"api-monitor\",\n      \"timestamp\": \"2026-06-23T10:00:00Z\",\n      \"claimed_fact\": \"Response Content-Type was text/xml, expected application/json\"\n    }\n  ]\n}"
         },
-        "url": {
-          "raw": "{{base_url}}/v1/disputes",
-          "host": ["{{base_url}}"],
-          "path": ["v1", "disputes"]
-        }
-      },
-      "response": []
+        "description": "File a dispute for API response schema mismatch. Expected: full_refund ruling."
+      }
     },
     {
-      "name": "Dispute: Milestone Unpaid",
+      "name": "File Dispute: Non-Delivery",
       "request": {
         "method": "POST",
+        "url": "{{base_url}}/v1/disputes",
         "header": [
           {"key": "Content-Type", "value": "application/json"}
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"claimant\": \"developer\",\n  \"respondent\": \"client\",\n  \"policy\": \"milestone-payment\",\n  \"claim\": \"Milestone completed but payment refused\",\n  \"desired_remedy\": \"full_payment\",\n  \"contract\": {\n    \"parties\": [\"developer\", \"client\"],\n    \"obligations\": [\"Pay milestone 2 upon completion\"],\n    \"deadlines\": [\"2026-06-20\"]\n  },\n  \"metadata\": {\n    \"milestone_completed\": true,\n    \"milestone_progress_pct\": 100,\n    \"days_since_completion\": 7,\n    \"payment_terms_days\": 0\n  },\n  \"evidence\": [\n    {\n      \"type\": \"contract\",\n      \"source\": \"agreement.pdf\",\n      \"timestamp\": \"2026-06-01\",\n      \"claimed_fact\": \"Milestone 2 payment due upon completion\"\n    },\n    {\n      \"type\": \"testimony\",\n      \"source\": \"acceptance.pdf\",\n      \"timestamp\": \"2026-06-15\",\n      \"claimed_fact\": \"Milestone 2 was accepted and completed\"\n    }\n  ]\n}"
+          "raw": "{\n  \"policy\": \"freelance-delivery\",\n  \"claim\": \"Work was never delivered\",\n  \"claimant\": \"client\",\n  \"respondent\": \"freelancer\",\n  \"desired_remedy\": \"full_refund\",\n  \"contract\": {\n    \"parties\": [\"client\", \"freelancer\"],\n    \"obligations\": [\"Deliver Python web scraper by June 20, 2026\"]\n  },\n  \"metadata\": {\n    \"delivered\": false,\n    \"meets_spec\": false\n  },\n  \"evidence\": [\n    {\n      \"type\": \"log\",\n      \"source\": \"project-management\",\n      \"timestamp\": \"2026-06-22T00:00:00Z\",\n      \"claimed_fact\": \"No deliverable submitted by deadline\"\n    }\n  ]\n}"
         },
-        "url": {
-          "raw": "{{base_url}}/v1/disputes",
-          "host": ["{{base_url}}"],
-          "path": ["v1", "disputes"]
-        }
-      },
-      "response": []
+        "description": "File a dispute for non-delivery of freelance work."
+      }
     },
     {
-      "name": "Dispute: SLA Violation",
+      "name": "File Dispute: SLA Breach",
       "request": {
         "method": "POST",
+        "url": "{{base_url}}/v1/disputes",
         "header": [
           {"key": "Content-Type", "value": "application/json"}
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"claimant\": \"client\",\n  \"respondent\": \"saas_provider\",\n  \"policy\": \"sla-monitoring\",\n  \"claim\": \"SLA uptime violation\",\n  \"desired_remedy\": \"service_credit\",\n  \"contract\": {\n    \"parties\": [\"client\", \"saas_provider\"],\n    \"obligations\": [\"Maintain 99.9 percent uptime\"],\n    \"deadlines\": [\"2026-06-30\"],\n    \"payment_terms\": \"SLA requires 99.9 percent uptime\"\n  },\n  \"metadata\": {\n    \"required_uptime\": 99.9,\n    \"actual_uptime\": 98.5,\n    \"max_latency\": 200,\n    \"actual_latency\": 450,\n    \"monitoring_period_confirmed\": true\n  },\n  \"evidence\": [\n    {\n      \"type\": \"contract\",\n      \"source\": \"sla.pdf\",\n      \"timestamp\": \"2026-06-01\",\n      \"claimed_fact\": \"SLA requires 99.9 percent uptime\"\n    },\n    {\n      \"type\": \"log\",\n      \"source\": \"monitoring.json\",\n      \"timestamp\": \"2026-06-22\",\n      \"claimed_fact\": \"Actual uptime was 98.5 percent for June\"\n    }\n  ]\n}"
+          "raw": "{\n  \"policy\": \"sla-monitoring\",\n  \"claim\": \"Service was down for 4 hours\",\n  \"claimant\": \"subscriber\",\n  \"respondent\": \"api-provider\",\n  \"desired_remedy\": \"partial_refund\",\n  \"contract\": {\n    \"parties\": [\"subscriber\", \"api-provider\"],\n    \"obligations\": [\"99.9% uptime SLA\"]\n  },\n  \"metadata\": {\n    \"uptime_percentage\": 83.3,\n    \"sla_threshold\": 99.9\n  },\n  \"evidence\": [\n    {\n      \"type\": \"log\",\n      \"source\": \"uptime-monitor\",\n      \"timestamp\": \"2026-06-23T00:00:00Z\",\n      \"claimed_fact\": \"Service unavailable from 02:00 to 06:00 UTC\"\n    }\n  ]\n}"
         },
-        "url": {
-          "raw": "{{base_url}}/v1/disputes",
-          "host": ["{{base_url}}"],
-          "path": ["v1", "disputes"]
-        }
-      },
-      "response": []
+        "description": "File a dispute for SLA/uptime breach."
+      }
     },
     {
-      "name": "Dispute: API Quality",
+      "name": "File Dispute: Bug Bounty Severity",
       "request": {
         "method": "POST",
+        "url": "{{base_url}}/v1/disputes",
         "header": [
           {"key": "Content-Type", "value": "application/json"}
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"claimant\": \"buyer_agent\",\n  \"respondent\": \"weather_api\",\n  \"policy\": \"api-quality\",\n  \"claim\": \"API returned wrong data type\",\n  \"desired_remedy\": \"full_refund\",\n  \"contract\": {\n    \"parties\": [\"buyer_agent\", \"weather_api\"],\n    \"obligations\": [\"Return weather data matching OpenAPI schema\"],\n    \"deadlines\": [\"2026-06-22\"]\n  },\n  \"metadata\": {\n    \"response_received\": true,\n    \"schema_matches\": false,\n    \"mismatched_field\": \"temperature\",\n    \"expected_type\": \"integer\",\n    \"actual_type\": \"string\"\n  },\n  \"evidence\": [\n    {\n      \"type\": \"contract\",\n      \"source\": \"openapi.json\",\n      \"timestamp\": \"2026-06-01\",\n      \"claimed_fact\": \"Schema declares temperature as integer\"\n    },\n    {\n      \"type\": \"log\",\n      \"source\": \"response.json\",\n      \"timestamp\": \"2026-06-22\",\n      \"claimed_fact\": \"API returned temperature as string\"\n    }\n  ]\n}"
+          "raw": "{\n  \"policy\": \"bug-bounty\",\n  \"claim\": \"Bug reported as critical is not reproducible\",\n  \"claimant\": \"project-owner\",\n  \"respondent\": \"researcher\",\n  \"desired_remedy\": \"no_payout\",\n  \"contract\": {\n    \"parties\": [\"project-owner\", \"researcher\"],\n    \"obligations\": [\"Pay $500 for critical bugs that are reproducible\"]\n  },\n  \"metadata\": {\n    \"bug_reproducible\": false,\n    \"severity_claimed\": \"critical\",\n    \"severity_actual\": \"none\"\n  },\n  \"evidence\": [\n    {\n      \"type\": \"test\",\n      \"source\": \"ci-pipeline\",\n      \"timestamp\": \"2026-06-23T10:00:00Z\",\n      \"claimed_fact\": \"Bug does not reproduce on clean environment\"\n    }\n  ]\n}"
         },
-        "url": {
-          "raw": "{{base_url}}/v1/disputes",
-          "host": ["{{base_url}}"],
-          "path": ["v1", "disputes"]
-        }
-      },
-      "response": []
+        "description": "File a dispute over bug bounty severity/reproducibility."
+      }
     },
     {
-      "name": "Dispute: Physical Commerce",
+      "name": "List Cases",
       "request": {
-        "method": "POST",
-        "header": [
-          {"key": "Content-Type", "value": "application/json"}
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"claimant\": \"shopping_agent\",\n  \"respondent\": \"merchant_store\",\n  \"policy\": \"physical-commerce\",\n  \"claim\": \"Wrong product delivered\",\n  \"desired_remedy\": \"full_refund\",\n  \"contract\": {\n    \"parties\": [\"shopping_agent\", \"merchant_store\"],\n    \"obligations\": [\"Deliver correct product as ordered\"],\n    \"deadlines\": [\"2026-06-25\"]\n  },\n  \"metadata\": {\n    \"delivery_confirmed\": true,\n    \"received_matches_order\": false,\n    \"ordered_product\": \"Blue sneakers size 10\",\n    \"received_product\": \"Red sneakers size 10\"\n  },\n  \"evidence\": [\n    {\n      \"type\": \"contract\",\n      \"source\": \"order_receipt\",\n      \"timestamp\": \"2026-06-20\",\n      \"claimed_fact\": \"Ordered blue sneakers size 10\"\n    },\n    {\n      \"type\": \"log\",\n      \"source\": \"delivery_photo.jpg\",\n      \"timestamp\": \"2026-06-22\",\n      \"claimed_fact\": \"Received red sneakers wrong color\"\n    }\n  ]\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/v1/disputes",
-          "host": ["{{base_url}}"],
-          "path": ["v1", "disputes"]
-        }
-      },
-      "response": []
+        "method": "GET",
+        "url": "{{base_url}}/v1/cases",
+        "description": "List all filed cases"
+      }
     },
     {
       "name": "List Verdicts",
       "request": {
         "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/v1/verdicts",
-          "host": ["{{base_url}}"],
-          "path": ["v1", "verdicts"]
-        }
-      },
-      "response": []
+        "url": "{{base_url}}/verdicts",
+        "description": "View recent verdicts dashboard"
+      }
+    },
+    {
+      "name": "x402 Manifest",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/.well-known/x402",
+        "description": "Get x402 payment manifest for agent discovery"
+      }
     }
   ]
 }
