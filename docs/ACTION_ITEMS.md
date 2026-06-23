@@ -22,6 +22,7 @@
    This unblocks awesome-mcp-servers PR #8570 (89K stars)
 
 5. **Hashnode/Medium API key** — For publishing blog posts we've written
+6. **GitHub PAT with workflow scope** — Enable CI/CD workflow (8 tests ready in tests/)
 
 ## Done (no action needed)
 - ✅ 3 ecosystem aggregator PRs submitted
