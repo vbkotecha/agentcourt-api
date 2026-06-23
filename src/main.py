@@ -300,10 +300,63 @@ async def demos_page():
 async def health():
     return {
         "status": "ok",
-        "version": "1.0.0",
+        "version": "1.2.0",
         "data_dir": DATA_DIR,
         "engine": "policy-engine-v1",
         "policies": [p["name"] for p in list_policies()],
+    }
+
+
+@app.get("/.well-known/x402")
+async def x402_manifest():
+    """x402 payment manifest for agent discovery."""
+    return {
+        "version": "1.0",
+        "name": "AgentCourt",
+        "description": "Policy-driven dispute resolution API for agent commerce",
+        "network": "base-mainnet",
+        "chain_id": "eip155:8453",
+        "currency": "USDC",
+        "endpoints": [
+            {
+                "path": "/v1/disputes",
+                "method": "POST",
+                "price": "$0.05",
+                "description": "Create a dispute and receive a deterministic ruling",
+            },
+            {
+                "path": "/v1/policies",
+                "method": "GET",
+                "price": "$0.00",
+                "description": "List all available policy templates",
+            },
+            {
+                "path": "/v1/policies/{policy_name}",
+                "method": "GET",
+                "price": "$0.00",
+                "description": "Get details for a specific policy template",
+            },
+            {
+                "path": "/v1/verdicts",
+                "method": "GET",
+                "price": "$0.00",
+                "description": "Browse recent verdicts",
+            },
+            {
+                "path": "/v1/disputes/preview",
+                "method": "POST",
+                "price": "$0.00",
+                "description": "Preview ruling without creating a case (demo mode)",
+            },
+        ],
+        "free_tier": {
+            "requests_per_month": 100,
+            "description": "100 free disputes per month, then $0.05/dispute via x402",
+        },
+        "categories": ["Infrastructure & Tooling", "Dispute Resolution"],
+        "contact": "https://github.com/vbkotecha/agentcourt-api",
+        "website": "https://vbkotecha.github.io/agentcourt-api/",
+        "license": "MIT",
     }
 
 
