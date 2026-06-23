@@ -5,6 +5,41 @@ All notable changes to AgentCourt are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-06-23
+
+### Added
+- **GitHub Pages Landing Page** — branded dark-theme site at vbkotecha.github.io/agentcourt-api
+- **OpenGraph + Twitter Card** — rich social link previews with branded og-image
+- **QUICKSTART.md** — 2-minute path to first ruling
+- **INTEGRATION_GUIDE.md** — 7 integration paths with code examples
+- **ERROR_HANDLING.md** — HTTP status codes, 402 x402 handling, retry strategy
+- **BENCHMARK.md** — real performance data (sub-100ms GET latency)
+- **ROADMAP.md** — 6-phase vision from v1 to mature ecosystem
+- **Architecture Decision Records** — ADR-001 (deterministic over LLM), ADR-002 (no escrow), ADR-003 (stateless)
+- **FAQ Section** — 7 expandable FAQs in README
+- **Market Ecosystem Analysis** — trust stack positioning diagram
+- **Product Hunt Launch Plan** — tagline, gallery, maker comment
+- **dev.to Article** — "Building AgentCourt" technical deep-dive
+- **Show HN Template** — ready-to-post submission
+- **One-Shot Publisher** — `scripts/publish_all.sh` for npm + PyPI
+- **Glama Submission Guide** — MCP server listing instructions
+- **Policy Request Template** — structured issue for community policy requests
+- **Community Discussion** — "What policies would you like to see?"
+- **Performance Benchmarks** — measured: /health 40ms, /policies 104ms, /cases 56ms, /verdicts 46ms
+
+### Distribution
+- **7 PRs** across 565K+ combined GitHub stars (1 merged)
+  - awesome-molt-ecosystem#27 — MERGED ✓
+  - public-apis#6388 (443K★)
+  - awesome-mcp-servers#8570 (89K★) — Glama submitted
+  - awesome-ai-agents#1146 (28K★) — needs CLA
+  - awesome-generative-ai#581 (3.5K★)
+  - awesome-x402#589
+  - awesome-agentic-commerce#356
+- **Glama.ai** — MCP server submitted via API
+- **GitHub Release v1.0.0** — published with full release notes
+- **GitHub Pages** — enabled and live
+
 ## [1.2.0] - 2026-06-23
 
 ### Added
