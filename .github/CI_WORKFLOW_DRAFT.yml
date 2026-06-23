@@ -1,11 +1,35 @@
-# Rename to .github/workflows/ci.yml after getting workflow scope on PAT
-name: CI
-on: [push, pull_request]
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.11' }
-      - run: python -m pytest tests/ -v
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install fastapi uvicorn httpx pydantic pytest
+
+      - name: Run tests
+        run: |
+          python -m pytest tests/ -v
+
+      - name: API Health Check
+        run: |
+          curl -s https://agentcourt-api-production.up.railway.app/health | python -m json.tool
