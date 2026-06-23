@@ -1,0 +1,20 @@
+{
+  "name": "AgentCourt Development",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "forwardPorts": [8000],
+  "postCreateCommand": "pip install -e sdk-python/ && python3 -c \"from agentcourt import AgentCourt; c=AgentCourt(); print(c.health())\"",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "redhat.vscode-yaml"
+      ]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    }
+  }
+}

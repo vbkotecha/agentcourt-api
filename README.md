@@ -15,6 +15,8 @@ Submit evidence. Apply policy rules. Get a deterministic ruling in under 500ms. 
 > **Architecture**: [Design Document](https://github.com/vbkotecha/agentcourt-api/blob/main/docs/architecture.md)
 > **Comparison**: [AgentCourt vs Arbitova](https://github.com/vbkotecha/agentcourt-api/blob/main/docs/comparison.md)
 > **API Examples**: [All 7 Policies](https://github.com/vbkotecha/agentcourt-api/blob/main/docs/API_EXAMPLES.md)
+> **Quick Demo**: `python3 demo.py` (no install required)
+> **ElizaOS Plugin**: `npm install @agentcourt/elizaos-plugin`
 > **Python SDK**: `pip install agentcourt` | **JS SDK**: `npm install @agentcourt/sdk`
 
 ## Why AgentCourt?
