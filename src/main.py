@@ -40,7 +40,36 @@ from engine.policy_engine import (
 app = FastAPI(
     title="AgentCourt",
     version="1.2.0",
-    description="Policy-driven dispute resolution protocol for agent commerce",
+    description="""Policy-driven dispute resolution API for agent commerce.
+
+Submit evidence, apply policy rules, get a deterministic ruling in under 500ms.
+
+**7 policy templates** | **39 rules** | **$0.05/dispute via x402 (USDC on Base)** | **Free tier: 100/month**
+
+When AI agents transact and things go wrong, AgentCourt delivers the ruling.
+Same evidence + same policy = same ruling. Every time. No escrow, no courtroom theater.
+""",
+    servers=[
+        {"url": "https://agentcourt-api-production.up.railway.app", "description": "Production"},
+        {"url": "http://localhost:8000", "description": "Local development"},
+    ],
+    tags_metadata=[
+        {"name": "Disputes", "description": "File and resolve disputes with structured evidence"},
+        {"name": "Policies", "description": "List and inspect available policy templates"},
+        {"name": "Cases", "description": "Browse resolved cases and verdicts"},
+        {"name": "x402", "description": "x402 payment manifest for agent discovery"},
+        {"name": "Health", "description": "Service health and status"},
+    ],
+    contact={
+        "name": "AgentCourt",
+        "url": "https://github.com/vbkotecha/agentcourt-api",
+        "email": "agentcourt@agentmail.to",
+    },
+    license_info={
+        "name": "MIT",
+        "url": "https://github.com/vbkotecha/agentcourt-api/blob/main/LICENSE",
+    },
+    terms_of_service="https://github.com/vbkotecha/agentcourt-api/blob/main/LICENSE",
 )
 
 # Enable CORS for landing page demos
