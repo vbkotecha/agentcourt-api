@@ -2,7 +2,7 @@
 
 ## Our Pledge
 
-We pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
+We are committed to providing a friendly, safe, and welcoming environment for all contributors, regardless of level of experience, gender, gender identity, sexual orientation, disability, personal appearance, body size, race, ethnicity, religion, nationality, or political views.
 
 ## Our Standards
 
@@ -16,16 +16,16 @@ Examples of behavior that contributes to a positive environment:
 
 Examples of unacceptable behavior:
 
-* The use of sexualized language or imagery and unwelcome sexual attention or advances
+* The use of sexualized language or imagery
 * Trolling, insulting/derogatory comments, and personal or political attacks
 * Public or private harassment
 * Publishing others' private information without explicit permission
-* Other conduct which could reasonably be considered inappropriate in a professional setting
+* Other conduct which could reasonably be considered inappropriate
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to support@agentcourt.to. All complaints will be reviewed and investigated promptly and fairly.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at `vbkotecha@gmail.com`. All complaints will be reviewed and investigated promptly and fairly.
 
 ## Attribution
 
-This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/), version 2.0.
+This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org), version 2.1.
