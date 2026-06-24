@@ -1,0 +1,17 @@
+{
+  "claimant": "customer@startup.io",
+  "respondent": "freelancer@dev.io",
+  "contract": {
+    "parties": ["customer@startup.io", "freelancer@dev.io"],
+    "obligations": ["Build landing page by June 15", "Include responsive design", "Deploy to Vercel"],
+    "payment_terms": "$3,000 USDC on delivery"
+  },
+  "claim": "Non-delivery of landing page. Deadline passed with no deliverable.",
+  "desired_remedy": "Full refund of advance payment ($1,500)",
+  "policy": "freelance-delivery",
+  "evidence": [
+    {"id": "e1", "type": "log", "source": "github", "timestamp": "2026-06-20T00:00:00Z", "claimed_fact": "Repository has no commits since May 28"},
+    {"id": "e2", "type": "log", "source": "email", "timestamp": "2026-06-16T10:00:00Z", "claimed_fact": "Freelancer acknowledged missing deadline"},
+    {"id": "e3", "type": "payment_proof", "source": "wallet", "timestamp": "2026-05-20T00:00:00Z", "claimed_fact": "$1,500 advance payment sent"}
+  ]
+}

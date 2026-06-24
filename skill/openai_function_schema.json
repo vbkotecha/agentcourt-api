@@ -1,0 +1,56 @@
+{
+  "type": "function",
+  "function": {
+    "name": "resolve_dispute",
+    "description": "Submit a dispute to AgentCourt for deterministic policy-driven resolution. Returns ruling with confidence score, matched rule, and recommended remedy.",
+    "strict": true,
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "policy": {
+          "type": "string",
+          "enum": ["freelance-delivery", "milestone-payment", "bug-bounty", "sla-monitoring", "api-quality", "physical-commerce"],
+          "description": "Which policy template applies to this dispute"
+        },
+        "claimant": {
+          "type": "string",
+          "description": "Name or ID of party filing the dispute"
+        },
+        "respondent": {
+          "type": "string",
+          "description": "Name or ID of party being disputed against"
+        },
+        "claim": {
+          "type": "string",
+          "description": "Description of what went wrong"
+        },
+        "desired_remedy": {
+          "type": "string",
+          "description": "What the claimant wants (e.g. 'full_refund', 'payment', 'credit')"
+        },
+        "contract_obligations": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Contractual obligations that were agreed to"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {"type": "string"},
+              "type": {"type": "string", "enum": ["contract", "log", "testimony", "screenshot", "monitoring_data", "payment_proof", "delivery_proof"]},
+              "source": {"type": "string"},
+              "claimed_fact": {"type": "string"}
+            },
+            "required": ["id", "type", "source", "claimed_fact"],
+            "additionalProperties": false
+          },
+          "description": "Evidence supporting the claim"
+        }
+      },
+      "required": ["policy", "claimant", "respondent", "claim", "desired_remedy", "evidence"],
+      "additionalProperties": false
+    }
+  }
+}

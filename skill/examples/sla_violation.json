@@ -1,0 +1,17 @@
+{
+  "claimant": "api-consumer@app.com",
+  "respondent": "api-provider@service.io",
+  "contract": {
+    "parties": ["api-consumer@app.com", "api-provider@service.io"],
+    "obligations": ["Maintain 99.9% monthly uptime", "Average response time under 200ms"],
+    "payment_terms": "$500/month, service credits for violations"
+  },
+  "claim": "SLA breach — 98.2% uptime in June, well below 99.9% requirement",
+  "desired_remedy": "$2,500 service credit per SLA terms",
+  "policy": "sla-monitoring",
+  "evidence": [
+    {"id": "e1", "type": "monitoring_data", "source": "datadog", "timestamp": "2026-06-30T00:00:00Z", "claimed_fact": "Monthly uptime: 98.2% (below 99.9% SLA)"},
+    {"id": "e2", "type": "log", "source": "cloudwatch", "timestamp": "2026-06-15T00:00:00Z", "claimed_fact": "4-hour outage on June 15"},
+    {"id": "e3", "type": "contract", "source": "agreement.pdf", "timestamp": "2026-01-01T00:00:00Z", "claimed_fact": "SLA requires 99.9% uptime with credits for violations"}
+  ]
+}

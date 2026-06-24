@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>x402 Dispute API — Monetize Dispute Resolution with USDC | AgentCourt</title>
+<meta name="description" content="AgentCourt is the first x402-native dispute resolution API. $0.05 USDC per ruling on Base Mainnet. Policy-driven, evidence-native, sub-200ms rulings.">
+</head>
+<body>
+<h1>x402 Dispute API: Monetize Dispute Resolution with USDC</h1>
+
+<p>AgentCourt is the first dispute resolution API built natively on the x402 payment protocol. Every ruling costs $0.05 USDC on Base Mainnet — agents pay programmatically, no accounts required.</p>
+
+<h2>What is x402?</h2>
+<p>x402 is an open payment protocol built by Coinbase that enables instant stablecoin payments over HTTP. The server returns a 402 Payment Required response, the client attaches payment, and the request proceeds. No payment processors, no accounts, no human intervention.</p>
+
+<h2>AgentCourt x402 Endpoints</h2>
+<table>
+<tr><th>Endpoint</th><th>Cost</th><th>Description</th></tr>
+<tr><td>POST /v1/disputes</td><td>$0.05 USDC</td><td>Submit a dispute for ruling</td></tr>
+<tr><td>GET /v1/policies</td><td>Free</td><td>List all policy templates</td></tr>
+<tr><td>GET /v1/cases/{id}</td><td>Free</td><td>Retrieve a ruling</td></tr>
+</table>
+
+<h2>Try the API</h2>
+<pre><code>curl -X POST https://agentcourt-api-production.up.railway.app/v1/disputes \
+  -H "Content-Type: application/json" \
+  -d '{"policy":"freelance-delivery","claimant":"buyer","respondent":"seller","contract":{"parties":["a","b"],"obligations":["deliver"],"payment_terms":"$5000"},"claim":"Non-delivery","desired_remedy":"Full refund","evidence":[{"id":"e1","type":"log","source":"github","timestamp":"2026-06-20","claimed_fact":"No delivery"}]}'</code></pre>
+<p>You'll get a 402 Payment Required — attach your x402 payment to get the ruling.</p>
+
+</body>
+</html>

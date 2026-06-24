@@ -1,0 +1,16 @@
+{
+  "claimant": "agent@platform.ai",
+  "respondent": "data-api@provider.io",
+  "contract": {
+    "parties": ["agent@platform.ai", "data-api@provider.io"],
+    "obligations": ["Return valid JSON matching OpenAPI schema", "Response time under 500ms"],
+    "payment_terms": "$0.01 per API call via x402"
+  },
+  "claim": "API returning malformed responses — schema mismatch on 40% of calls",
+  "desired_remedy": "Refund of $25 for 2,500 affected calls",
+  "policy": "api-quality",
+  "evidence": [
+    {"id": "e1", "type": "log", "source": "application_logs", "timestamp": "2026-06-20T14:00:00Z", "claimed_fact": "1,000 of 2,500 calls returned schema validation errors"},
+    {"id": "e2", "type": "screenshot", "source": "api_test", "timestamp": "2026-06-20T14:05:00Z", "claimed_fact": "Response missing 'data' field required by OpenAPI spec"}
+  ]
+}

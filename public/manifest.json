@@ -1,0 +1,10 @@
+{
+  "name": "AgentCourt",
+  "short_name": "AgentCourt",
+  "description": "Policy-driven dispute resolution for agent commerce",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0B0D",
+  "theme_color": "#E8B339",
+  "icons": []
+}

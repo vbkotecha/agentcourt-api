@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Dispute Resolution — How AI Agents Resolve Disputes | AgentCourt</title>
+<meta name="description" content="AgentCourt provides policy-driven dispute resolution for AI agent commerce. Submit evidence, get binding rulings in 200ms. x402-native, $0.05/dispute on Base.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Agent Dispute Resolution: How AI Agents Resolve Disputes Without Courts",
+  "author": {"@type": "Organization", "name": "AgentCourt"},
+  "datePublished": "2026-06-23",
+  "mainEntityOfPage": "https://agentcourt-api-production.up.railway.app/blog/agent-dispute-resolution"
+}
+</script>
+</head>
+<body>
+<h1>Agent Dispute Resolution: How AI Agents Resolve Disputes Without Courts</h1>
+
+<p>When two AI agents transact, what happens when one doesn't deliver? Traditional courts are too slow, too expensive, and too human. AgentCourt solves this with policy-driven dispute resolution built for machine-to-machine commerce.</p>
+
+<h2>What is Agent Dispute Resolution?</h2>
+<p>Agent dispute resolution is the process of resolving conflicts between autonomous AI agents — whether it's a missed delivery, an SLA violation, or a disputed bug bounty payout. AgentCourt resolves these in under 200ms using pre-defined policy templates.</p>
+
+<h2>How AgentCourt Works</h2>
+<ol>
+<li><strong>Submit Evidence:</strong> Both parties submit evidence (logs, timestamps, delivery proofs)</li>
+<li><strong>Policy Matching:</strong> AgentCourt matches the dispute to the appropriate policy template</li>
+<li><strong>Instant Ruling:</strong> The engine evaluates evidence against policy rules and issues a binding ruling</li>
+<li><strong>Payment:</strong> $0.05 USDC per dispute via x402 on Base Mainnet</li>
+</ol>
+
+<h2>Available Dispute Types</h2>
+<ul>
+<li>Freelance delivery disputes</li>
+<li>Milestone payment disputes</li>
+<li>Bug bounty severity disputes</li>
+<li>SLA/uptime monitoring disputes</li>
+<li>API quality disputes</li>
+<li>Physical commerce disputes</li>
+<li>Scope and deliverable disputes</li>
+</ul>
+
+<h2>x402-Native Payments</h2>
+<p>Every dispute costs $0.05 USDC on Base Mainnet. Agents pay programmatically using the x402 payment protocol — no accounts, no signup, no human intervention.</p>
+
+<h2>Get Started</h2>
+<pre><code>pip install agentcourt
+
+from agentcourt import AgentCourt
+court = AgentCourt()
+ruling = court.dispute(
+    policy="freelance-delivery",
+    claimant="buyer.eth",
+    respondent="seller.eth",
+    contract={"parties": ["buyer", "seller"], "obligations": ["deliver"], "payment_terms": "$5000"},
+    claim="Non-delivery",
+    remedy="Full refund",
+)
+print(ruling.ruling)</code></pre>
+
+<p><a href="/">Try AgentCourt API →</a></p>
+</body>
+</html>
