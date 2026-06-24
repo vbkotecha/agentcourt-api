@@ -80,6 +80,64 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# --- x402 Payment Protocol (Base Mainnet) ---
+# Every /v1/disputes call requires $0.05 USDC payment
+X402_WALLET = os.environ.get("X402_WALLET", "0x9863aB6242663FCc84c33632741711dB78f8Fd15")
+X402_NETWORK = "eip155:8453"  # Base Mainnet
+X402_FACILITATOR_URL = os.environ.get("X402_FACILITATOR_URL", "https://api.cdp.coinbase.com/platform/v2/x402")
+X402_PRICE = os.environ.get("X402_PRICE", "$0.05")
+
+try:
+    from x402.http import FacilitatorConfig, HTTPFacilitatorClient, PaymentOption, CreateHeadersAuthProvider
+    from x402.http.middleware.fastapi import PaymentMiddlewareASGI
+    from x402.http.types import RouteConfig
+    from x402.mechanisms.evm.exact import ExactEvmServerScheme
+    from x402.server import x402ResourceServer
+    from x402_payment import create_cdp_auth_headers, CDP_FACILITATOR_URL
+
+    auth_provider = CreateHeadersAuthProvider(create_cdp_auth_headers)
+
+    facilitator = HTTPFacilitatorClient(
+        FacilitatorConfig(
+            url=CDP_FACILITATOR_URL,
+            auth_provider=auth_provider,
+        )
+    )
+    payment_server = x402ResourceServer(facilitator)
+    payment_server.register(X402_NETWORK, ExactEvmServerScheme())
+
+    payment_routes = {
+        "POST /v1/disputes": RouteConfig(
+            accepts=[
+                PaymentOption(
+                    scheme="exact",
+                    pay_to=X402_WALLET,
+                    price=X402_PRICE,
+                    network=X402_NETWORK,
+                ),
+            ],
+            mime_type="application/json",
+            description="Submit a dispute for policy-driven ruling",
+        ),
+    }
+
+    app.add_middleware(
+        PaymentMiddlewareASGI,
+        routes=payment_routes,
+        server=payment_server,
+    )
+    print(f"[x402] Payment middleware enabled — POST /v1/disputes costs {X402_PRICE} USDC on Base Mainnet", flush=True)
+    X402_ENABLED = True
+except ImportError as e:
+    print(f"[x402] NOT installed — running in free mode. Error: {e}", flush=True)
+    X402_ENABLED = False
+except Exception as e:
+    import traceback
+    print(f"[x402] Failed to initialize — running in free mode. Error: {e}", flush=True)
+    traceback.print_exc()
+    X402_ENABLED = False
+
 # --- Data directory ---
 DATA_DIR = os.environ.get("AGENTCOURT_DATA_DIR", "/root/.letta/agentcourt/data")
 os.makedirs(DATA_DIR, exist_ok=True)
