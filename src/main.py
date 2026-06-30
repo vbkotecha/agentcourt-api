@@ -22,6 +22,8 @@ from datetime import datetime
 import uuid
 import json
 import sys
+import urllib.request
+import urllib.error
 
 # Add src to path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -39,7 +41,7 @@ from engine.policy_engine import (
 
 app = FastAPI(
     title="AgentCourt",
-    version="1.2.0",
+    version="1.4.0",
     description="""Policy-driven dispute resolution API for agent commerce.
 
 Submit evidence, apply policy rules, get a deterministic ruling in under 500ms.
@@ -197,7 +199,7 @@ class RulingResponse(BaseModel):
     policy_version: Optional[str] = None
     evidence_scores: Optional[List[dict]] = None
     ruled_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
-    engine_version: str = "1.2.0"
+    engine_version: str = "1.4.0"
 
 
 # ─── Storage ─────────────────────────────────────────────────────────────────
@@ -351,7 +353,7 @@ async def root():
     return {
         "name": "AgentCourt",
         "tagline": "The dispute layer for agent commerce",
-        "version": "1.2.0",
+        "version": "1.4.0",
         "endpoints": {
             "submit_dispute": "POST /v1/disputes",
             "list_policies": "GET /v1/policies",
@@ -387,7 +389,7 @@ async def demos_page():
 async def health():
     return {
         "status": "ok",
-        "version": "1.2.0",
+        "version": "1.4.0",
         "data_dir": DATA_DIR,
         "engine": "policy-engine-v1",
         "policies": [p["name"] for p in list_policies()],
@@ -434,6 +436,30 @@ async def x402_manifest():
                 "method": "POST",
                 "price": "$0.00",
                 "description": "Preview ruling without creating a case (demo mode)",
+            },
+            {
+                "path": "/v1/lcp/disputes",
+                "method": "POST",
+                "price": "$0.05",
+                "description": "File an LCP-compliant dispute with automatic terms verification",
+            },
+            {
+                "path": "/v1/lcp/check/{domain}",
+                "method": "GET",
+                "price": "$0.00",
+                "description": "Check if a domain implements the Legal Context Protocol",
+            },
+            {
+                "path": "/v1/lcp/verify/{domain}",
+                "method": "GET",
+                "price": "$0.00",
+                "description": "Verify a domain's LCP terms hash",
+            },
+            {
+                "path": "/.well-known/legal-context.json",
+                "method": "GET",
+                "price": "$0.00",
+                "description": "AgentCourt's own LCP discovery document (Level 4)",
             },
         ],
         "free_tier": {
@@ -506,6 +532,166 @@ async def list_verdicts(limit: int = 50):
         "total": len(verdicts),
         "verdicts": verdicts,
     }
+
+
+# ─── LCP (Legal Context Protocol) Endpoints ──────────────────────────────────
+
+from lcp_adapter import LCPAdapter, LCPDisputeRequest, LCPDiscoveryDocument
+
+_lcp = LCPAdapter()
+
+
+@app.get("/.well-known/legal-context.json")
+async def lcp_discovery():
+    """LCP Level 4 Discovery Document for AgentCourt.
+
+    Makes AgentCourt's legal terms discoverable at the standardized LCP URL.
+    Any agent can find our terms, verify them, and know how to file disputes.
+    """
+    return _lcp.get_discovery_document()
+
+
+@app.get("/.well-known/dispute-services.json")
+async def lcp_dispute_catalog():
+    """LCP dispute services catalog.
+
+    Programmatic catalog of AgentCourt dispute resolution offerings.
+    Allows agents to browse policies, parameters, and pricing.
+    """
+    return _lcp.get_dispute_services_catalog()
+
+
+@app.get("/terms.md", response_class=PlainTextResponse)
+async def lcp_terms_document():
+    """AgentCourt terms document (referenced by LCP discovery)."""
+    return PlainTextResponse(_lcp.get_terms_document(), media_type="text/markdown")
+
+
+@app.get("/dispute-resolution-rules.md", response_class=PlainTextResponse)
+async def lcp_dispute_rules():
+    """AgentCourt dispute resolution rules (referenced by LCP discovery)."""
+    return PlainTextResponse(_lcp.get_dispute_rules_document(), media_type="text/markdown")
+
+
+class LCPDisputeBody(BaseModel):
+    """Request body for filing an LCP-compliant dispute."""
+    service_domain: str = Field(..., description="Domain of the service being disputed (LCP discovery will be fetched)")
+    claimant: str
+    respondent: str
+    claim: str
+    desired_remedy: str
+    evidence: List[EvidenceItem]
+    terms_content: Optional[str] = Field(None, description="Raw terms document content for hash verification")
+    policy_override: Optional[str] = Field(None, description="Override automatic policy selection")
+    metadata: Optional[dict] = None
+
+
+@app.post("/v1/lcp/disputes")
+async def file_lcp_dispute(body: LCPDisputeBody):
+    """File a dispute using LCP context.
+
+    Fetches the LCP discovery document from the service domain,
+    verifies terms hash if provided, maps to appropriate AgentCourt policy,
+    and resolves the dispute with full LCP metadata.
+    """
+    terms_bytes = body.terms_content.encode() if body.terms_content else None
+
+    try:
+        lcp_request = LCPDisputeRequest(
+            service_domain=body.service_domain,
+            claimant=body.claimant,
+            respondent=body.respondent,
+            claim=body.claim,
+            desired_remedy=body.desired_remedy,
+            evidence=[e.model_dump() for e in body.evidence],
+            terms_content=terms_bytes,
+            policy_override=body.policy_override,
+            metadata=body.metadata,
+        )
+        dispute_dict = lcp_request.resolve()
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"LCP resolution failed: {str(e)}")
+
+    # Evaluate through the policy engine
+    try:
+        ruling = evaluate_dispute(
+            dispute=dispute_dict,
+            evidence=dispute_dict["evidence"],
+            policy_name=dispute_dict["policy"],
+        )
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Engine error: {str(e)}")
+
+    # Save case with LCP metadata
+    case_id = str(uuid.uuid4())[:12]
+    case_data = {
+        "case_id": case_id,
+        "claimant": body.claimant,
+        "respondent": body.respondent,
+        "claim": body.claim,
+        "policy": dispute_dict["policy"],
+        "dispute_type": "lcp-compliant",
+        "evidence_count": len(body.evidence),
+        "created_at": datetime.utcnow().isoformat(),
+        "status": ruling["status"],
+        "lcp_metadata": dispute_dict.get("metadata", {}),
+    }
+    save_case(case_id, {"request": case_data, "ruling": ruling})
+
+    return {
+        **ruling,
+        "case_id": case_id,
+        "lcp_verified": dispute_dict.get("metadata", {}).get("lcp_terms_verified", False),
+        "lcp_domain": body.service_domain,
+        "lcp_policy_selected": dispute_dict["policy"],
+    }
+
+
+@app.get("/v1/lcp/check/{domain}")
+async def check_domain_lcp(domain: str):
+    """Check if a domain implements LCP and inspect its discovery document.
+
+    Useful for agents to verify a counterparty's legal context before transacting.
+    """
+    return LCPAdapter.check_domain_lcp(domain)
+
+
+@app.get("/v1/lcp/verify/{domain}")
+async def verify_domain_terms(
+    domain: str,
+    terms_url: Optional[str] = Query(None, description="Override terms URL to verify"),
+):
+    """Verify a domain's LCP terms hash.
+
+    Fetches the terms document and checks it against the published atrHash.
+    """
+    discovery = LCPDiscoveryDocument.fetch(domain)
+    result = {
+        "domain": domain,
+        "has_hash": bool(discovery.atr_hash),
+        "atr_hash": discovery.atr_hash,
+        "terms_url": terms_url or discovery.terms_url,
+    }
+
+    if discovery.atr_hash and (terms_url or discovery.terms_url):
+        try:
+            req = urllib.request.Request(terms_url or discovery.terms_url)
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                terms_content = resp.read()
+            result["hash_verified"] = discovery.verify_terms_hash(terms_content)
+            result["terms_size_bytes"] = len(terms_content)
+        except Exception as e:
+            result["hash_verified"] = False
+            result["error"] = f"Could not fetch terms: {e}"
+    else:
+        result["hash_verified"] = None
+        result["note"] = "No atrHash to verify against"
+
+    return result
 
 
 @app.get("/verdicts", response_class=HTMLResponse)

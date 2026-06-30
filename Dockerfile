@@ -4,7 +4,7 @@ LABEL org.opencontainers.image.title="AgentCourt" \
       org.opencontainers.image.description="Policy-driven dispute resolution API for AI agent commerce" \
       org.opencontainers.image.source="https://github.com/vbkotecha/agentcourt-api" \
       org.opencontainers.image.licenses="MIT" \
-      org.opencontainers.image.version="1.3.0"
+      org.opencontainers.image.version="1.4.0"
 
 WORKDIR /app
 
@@ -15,6 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy source
 COPY src/ ./src/
 COPY sdk/ ./sdk/
+COPY sdk-python/ ./sdk-python/
+COPY mcp-server/ ./mcp-server/
 COPY tests/ ./tests/
 
 # Run as non-root user
