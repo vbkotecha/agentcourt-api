@@ -710,6 +710,123 @@ async def verify_domain_terms(
     return result
 
 
+@app.get("/.well-known/agent.json")
+async def agent_json():
+    """Agent discovery manifest for AgentCourt."""
+    return {
+        "name": "AgentCourt",
+        "version": "1.4.0",
+        "description": "Policy-driven dispute resolution API for agent commerce",
+        "url": "https://api.agentcourt.to",
+        "capabilities": ["dispute-resolution", "policy-evaluation", "verdict-tracking"],
+        "payment": {"protocol": "x402", "currency": "USDC", "chain": "base-mainnet"},
+        "endpoints": {
+            "dispute": "/v1/disputes",
+            "policies": "/v1/policies",
+            "verdicts": "/v1/verdicts",
+            "lcp_dispute": "/v1/lcp/disputes"
+        },
+        "docs": "/docs",
+        "health": "/health"
+    }
+
+
+@app.get("/llms.txt", response_class=PlainTextResponse)
+async def llms_txt():
+    """LLM-friendly service description."""
+    return PlainTextResponse("""# AgentCourt
+> Policy-driven dispute resolution API for agent commerce
+
+## Overview
+AgentCourt resolves disputes between AI agents using deterministic policy templates. Submit a dispute, receive a ruling with confidence score, reasoning, and remedy.
+
+## Authentication
+No API keys. Uses x402 payment protocol — agents pay per request in USDC on Base.
+
+## Endpoints
+- POST /v1/disputes — Submit a dispute ($0.05)
+- GET /v1/policies — List policy templates (free)
+- GET /v1/policies/{name} — Get policy details (free)
+- GET /v1/verdicts — Browse verdicts (free)
+- POST /v1/disputes/preview — Preview ruling (free)
+- POST /v1/lcp/disputes — File LCP-compliant dispute ($0.05)
+- GET /.well-known/legal-context.json — LCP discovery (free)
+- GET /.well-known/dispute-services.json — Dispute catalog (free)
+- GET /health — Service health (free)
+- GET /docs — OpenAPI docs (free)
+
+## Pricing
+$0.05 per dispute filing. Free for policy browsing, verdicts, and previews.
+
+## Payment
+x402 protocol with CDP Facilitator. USDC on Base mainnet (chain 8453).
+""", media_type="text/plain")
+
+
+@app.get("/schema.json")
+async def schema_json():
+    """JSON schema for AgentCourt API."""
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "AgentCourt API",
+        "version": "1.4.0",
+        "description": "Dispute resolution API for agent commerce",
+        "base_url": "https://api.agentcourt.to",
+        "endpoints": [
+            {
+                "path": "/v1/disputes",
+                "method": "POST",
+                "price": "$0.05",
+                "description": "Create a dispute and receive a deterministic ruling",
+                "request_schema": {
+                    "type": "object",
+                    "required": ["claimant", "respondent", "claim", "desired_remedy", "evidence"],
+                    "properties": {
+                        "claimant": {"type": "string"},
+                        "respondent": {"type": "string"},
+                        "claim": {"type": "string"},
+                        "desired_remedy": {"type": "string"},
+                        "evidence": {"type": "array", "items": {"type": "object"}},
+                        "policy": {"type": "string", "description": "Optional policy override"}
+                    }
+                }
+            },
+            {
+                "path": "/v1/policies",
+                "method": "GET",
+                "price": "$0.00",
+                "description": "List all available policy templates"
+            }
+        ]
+    }
+
+
+@app.get("/manifest.json")
+async def manifest_json():
+    """Service manifest for discovery platforms."""
+    return {
+        "name": "AgentCourt",
+        "version": "1.4.0",
+        "description": "Policy-driven dispute resolution API for agent commerce on Base",
+        "base_url": "https://api.agentcourt.to",
+        "payment": {
+            "protocol": "x402",
+            "price_per_dispute": "$0.05",
+            "currency": "USDC",
+            "chain": "base-mainnet",
+            "chain_id": 8453
+        },
+        "discovery": {
+            "agent_json": "/.well-known/agent.json",
+            "llms_txt": "/llms.txt",
+            "x402_manifest": "/.well-known/x402",
+            "lcp_discovery": "/.well-known/legal-context.json",
+            "schema": "/schema.json",
+            "openapi": "/docs"
+        }
+    }
+
+
 @app.get("/verdicts", response_class=HTMLResponse)
 async def verdict_dashboard():
     """Public verdict dashboard HTML page."""
