@@ -121,6 +121,22 @@ try:
             ],
             mime_type="application/json",
             description="Submit a dispute for policy-driven ruling",
+            extensions={
+                "bazaar": {
+                    "discoverable": True,
+                    "category": "dispute-resolution",
+                    "tags": ["dispute", "legal", "arbitration", "agent-commerce", "policy"],
+                    "serviceName": "AgentCourt Dispute Resolution",
+                    "inputSchema": {
+                        "bodySchema": {
+                            "policy": {"type": "string", "description": "Policy template name"},
+                            "plaintiff": {"type": "string", "description": "Plaintiff address or ID"},
+                            "respondent": {"type": "string", "description": "Respondent address or ID"},
+                            "evidence": {"type": "array", "description": "Evidence items"}
+                        }
+                    },
+                }
+            },
         ),
     }
 
